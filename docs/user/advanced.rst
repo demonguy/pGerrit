@@ -24,7 +24,7 @@ Searching changes can be done by query method of GerritChange class::
     auth = HTTPBasicAuth("xxxxxxxxxxxx","xxxxxxxxxxxxxx")
     client = GerritClient("https://xxxx.gerrit.com/", auth=auth)
 
-    changes = change.query(q="owner:self status:merged", **{"no-limit":"", "o":["CURRENT_REVISION", "CURRENT_COMMIT"]})
+    changes = client.change.query(q="owner:self status:merged", **{"no-limit":"", "o":["CURRENT_REVISION", "CURRENT_COMMIT"]})
 
     for change in changes:
         print("branch name:" + change.branch)
