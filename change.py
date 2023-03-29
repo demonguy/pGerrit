@@ -28,24 +28,24 @@ class GerritChange(GerritClient):
 
     @GerritRest.get
     def detail(self, *args, **kwargs):
-        return urljoin(self.url, "/detail/")
+        return urljoin(self.url, "/detail")
 
     @GerritRest.get
     def info(self, *args, **kwargs):
-        return urljoin(self.url)
-
-    def is_merge(self):
-        info = self.info(o=["ALL_COMMITS", "CURRENT_REVISION"])
-        if len(info.revisions.__getattribute__(info.current_revision).commit.parents) == 2:
-            return True
-        else:
-            return False
+        return self.url
 
     def revision(self, revisionID):
         return GerritChangeRevision(self.host, self.id, revisionID, **self.kwargs)
 
     def current_revision(self):
         return GerritChangeRevision(self.host, self.id, "current", **self.kwargs)
+
+    def is_merge(self):
+        revision = self.current_revision()
+        if len(revision.commit().parents) == 2:
+            return True
+        else:
+            return False
 
 class GerritChangeRevision(GerritChange):
     """Interface to the Gerrit REST API.
@@ -70,7 +70,11 @@ class GerritChangeRevision(GerritChange):
 
     @GerritRest.get
     def files(self, *args, **kwargs):
-        return urljoin(self.url, "/files/")
+        return urljoin(self.url, "/files")
+
+    @GerritRest.get
+    def commit(self, *args, **kwargs):
+        return urljoin(self.url, "/commit")
 
     def file(self, fileID):
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
@@ -85,5 +89,5 @@ class GerritChangeRevisionFile(GerritChangeRevision):
 
     @GerritRest.get
     def content(self, *args, **kwargs):
-        return urljoin(self.url, "/content/")
+        return urljoin(self.url, "/content")
         

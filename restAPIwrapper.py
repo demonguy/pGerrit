@@ -18,5 +18,3 @@ class GerritRest(object):
             # des.resultType
             return res.json(object_hook=lambda d: SimpleNamespace(**d))
         return decorator_get
-
-        
