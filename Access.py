@@ -1,6 +1,6 @@
-from Gerrit.restAPIwrapper import GerritRest
-from Gerrit.client import GerritClient
-from Gerrit.utils import urljoin, urlformat
+from pGerrit.restAPIwrapper import GerritRest
+from pGerrit.client import GerritClient
+from pGerrit.utils import urljoin, urlformat
 
 class GerritAccess(GerritClient):
     """Interface to the Gerrit REST API.

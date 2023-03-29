@@ -45,9 +45,9 @@ class GerritClient(object):
         self.session.close()
 
     def change(self, gerritID):
-        from Gerrit.change import GerritChange
+        from pGerrit.change import GerritChange
         return GerritChange(self.host, gerritID, **self.kwargs)
 
     def access(self):
-        from Gerrit.Access import GerritAccess
+        from pGerrit.Access import GerritAccess
         return GerritAccess(self.host, **self.kwargs)
