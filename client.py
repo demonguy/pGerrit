@@ -38,6 +38,9 @@ class GerritClient(object):
         if not self.host.endswith("/"):
             self.host += "/"
 
+    def __del__(self):
+        self.session.close()
+
     def change(self, gerritID):
         from Gerrit.change import GerritChange
         return GerritChange(self.host, gerritID, **self.kwargs)
