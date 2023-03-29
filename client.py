@@ -3,7 +3,7 @@ from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 import requests_cache
 
-requests_cache.install_cache(expire_after=900)
+requests_cache.install_cache(expire_after=900, include_get_headers=True)
 
 class GerritClient(object):
     """Interface to the Gerrit REST API.
