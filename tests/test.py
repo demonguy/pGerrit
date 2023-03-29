@@ -47,7 +47,7 @@ class TestChange(unittest.TestCase):
     def setUp(self):
         requests.packages.urllib3.disable_warnings()
         self.auth = HTTPBasicAuth(g_username, g_password)
-        self.client = GerritClient(g_host, auth=self.auth, verify=False)
+        self.client = GerritClient(g_host, auth=self.auth, verify=False, cache=False)
         self.change = self.client.change(g_id)
 
     def tearDown(self):

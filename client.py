@@ -3,8 +3,6 @@ from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 import requests_cache
 
-requests_cache.install_cache(expire_after=900, include_get_headers=True)
-
 class GerritClient(object):
     """Interface to the Gerrit REST API.
     :arg str url: The full URL to the server, including the `http(s)://`
@@ -19,10 +17,14 @@ class GerritClient(object):
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
 
-    def __init__(self, host, auth=None, verify=True, adapter=None):
+    def __init__(self, host, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
         self.host = host
-        self.session = requests.session()
+        if cache:
+            self.session = requests_cache.CachedSession(expire_after=cache_expire)
+        else:
+            self.session = requests.session()
+
         self.verify = verify
         if not adapter:
             retry = Retry(
