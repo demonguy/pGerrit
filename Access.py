@@ -20,6 +20,6 @@ class GerritAccess(GerritClient):
         """See class docstring."""
         super().__init__(host, auth=auth, verify=verify, adapter=adapter)
 
-    @GerritRest.get
+    @GerritRest.get()
     def query(self, *args, **kwargs):
         return urljoin(self.host, urlformat(GerritAccess._endpoint, ""))

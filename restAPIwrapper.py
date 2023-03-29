@@ -10,18 +10,25 @@ class GerritRest(object):
     """
     docstring for RestAPI
     """
-    def get(func):
-        @wraps(func)
-        def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
-            url = func(self, headers=headers, *args, **kwargs)
-            url = url if self.session.auth else url.replace("/a/", "/")
-            res = self.session.get(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
-            res._content = res._content.replace(b")]}'\n", b"")
-            if res.status_code != 200:
-                raise GerritError(res.status_code, res.content)
-            return res.json(object_hook=lambda d: SimpleNamespace(**d))
+    def get(raw=False):
+        def dec_get(func):
+            @wraps(func)
+            def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
+                if raw:
+                    headers = None
+                url = func(self, headers=headers, *args, **kwargs)
+                url = url if self.session.auth else url.replace("/a/", "/")
+                res = self.session.get(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
+                res._content = res._content.replace(b")]}'\n", b"")
+                if res.status_code != 200:
+                    raise GerritError(res.status_code, res.content)
 
-        return decorator_get
+                if raw:
+                    return res
+                else:
+                    return res.json(object_hook=lambda d: SimpleNamespace(**d))
+            return decorator_get
+        return dec_get
 
     def put(func):
         @wraps(func)
