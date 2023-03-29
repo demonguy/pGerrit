@@ -27,6 +27,8 @@ class GerritRest(object):
         @wraps(func)
         def decorator_put(self, payload=None, headers=None, **kwargs):
             url = func(self, payload, headers=headers)
+            headers = headers or self.session.headers
+            headers["content-type"] = "application/json"
             res = self.session.put(url, payload, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
@@ -38,12 +40,23 @@ class GerritRest(object):
         def decorator_post(self, payload=None, headers=None, **kwargs):
             url = func(self, payload, headers=headers)
             headers = headers or self.session.headers
-            headers["Content-Type"] = "application/json"
+            headers["content-type"] = "application/json"
             res = self.session.post(url, json.dumps(payload), headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
             return res
         return decorator_post
+
+    def delete(func):
+        @wraps(func)
+        def decorator_delete(self, *args, **kwargs):
+            url = func(self, *args, **kwargs)
+            self.session.headers["Accept"] = "application/json"
+            res = self.session.delete(url, verify=self.kwargs["verify"], params=kwargs)
+            # res._content = res._content.replace(b")]}'\n", b"")
+            # des.resultType
+            return res
+        return decorator_delete
 
     def url_wrapper(end=None):
         def wrapper(func):

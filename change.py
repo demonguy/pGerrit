@@ -99,8 +99,13 @@ class GerritChange(GerritClient):
         pass
 
     @GerritRest.post
-    @GerritRest.url_wrapper()
+    @GerritRest.url_wrapper("edit:publish")
     def edit_publish(self, payload=None, headers=None):
+        pass
+
+    @GerritRest.delete
+    @GerritRest.url_wrapper("edit")
+    def edit_delete(self, payload=None, headers=None):
         pass
 
 class GerritChangeRevision(GerritChange):
@@ -182,6 +187,9 @@ class GerritChangeRevision(GerritChange):
     def file(self, fileID):
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
 
+    def reviwer(self, accountID):
+        return GerritChangeRevisionReviewer(self.host, self.id, self.revisionID, accountID, **self.kwargs)
+
     def getParentInfo(self):
         # assume there are only 1 or 2 parents
         current_info = self.query(q=self.commit().commit)[0]
@@ -207,6 +215,36 @@ class GerritChangeRevision(GerritChange):
 
         commit = self.commit()
         return pattern.format(commit.commit, commit.author.name, commit.author.email, commit.author.date, commit.message)
+
+class GerritChangeRevisionReviewer(GerritChangeRevision):
+    """Interface to the Gerrit REST API.
+    :arg str url: The full URL to the server, including the `http(s)://`
+        prefix. If `auth` is given, `url` will be automatically adjusted to
+        include Gerrit's authentication suffix.
+    :arg auth: (optional) Authentication handler.  Must be derived from
+        `requests.auth.HTTPDigestAuth`.
+    :arg boolean verify: (optional) Set to False to disable verification of
+        SSL certificates.
+    :arg requests.adapters.BaseAdapter adapter: (optional) Custom connection
+        adapter. See
+        https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
+    """
+    _endpoint ="/a/changes/{}/revisions/{}/reviewers/{}"
+    _args = ["id", "accountID", "revisionID", "accountID"]
+
+    def __init__(self, host, gerritID, revisionID, accountID, auth=None, verify=True, adapter=None):
+        """See class docstring."""
+        super().__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
+        self.accountID = accountID
+
+    @GerritRest.get
+    def list(self, *args, **kwargs):
+        return urljoin(self.host, urlformat(self._endpoint, self.id, self.revisionID, ""))
+
+    @GerritRest.delete
+    def delete_vote(self, label, *args, **kwargs):
+        print(urljoin(self.host, urlformat(self._endpoint, self.id, self.revisionID, self.accountID), "votes", label))
+        return urljoin(self.host, urlformat(self._endpoint, self.id, self.revisionID, self.accountID), "votes", label)
 
 
 class GerritChangeRevisionFile(GerritChangeRevision):
@@ -253,4 +291,8 @@ class GerritChangeRevisionFile(GerritChangeRevision):
 
     @GerritRest.put
     def edit(self, payload, headers=None):
+        return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
+
+    @GerritRest.get
+    def edit_retrieve(self, headers=None):
         return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
