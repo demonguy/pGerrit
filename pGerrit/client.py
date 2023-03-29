@@ -17,7 +17,7 @@ class GerritClient(object):
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
 
-    def __init__(self, host, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+    def __init__(self, host, auth=None, cookies=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
         self.host = host
         if cache:
@@ -37,8 +37,12 @@ class GerritClient(object):
             adapter = HTTPAdapter(max_retries=retry)
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
-        self.session.auth = auth
         self.adapter = adapter
+
+        if auth:
+            self.session.auth = auth
+        elif cookies:
+            self.session.cookies = cookies
 
         self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter}
 
