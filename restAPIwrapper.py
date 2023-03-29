@@ -12,10 +12,10 @@ class GerritRest(object):
     """
     def get(func):
         @wraps(func)
-        def decorator_get(self, *args, **kwargs):
-            url = func(self)
-            self.session.headers["Accept"] = "application/json"
-            res = self.session.get(url, verify=self.kwargs["verify"], params=kwargs)
+        def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
+            url = func(self, headers=headers, *args, **kwargs)
+            headers = self.session.headers.update(headers)
+            res = self.session.get(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")
             if res.status_code != 200:
                 raise GerritError(res.status_code, res.content)
@@ -25,10 +25,9 @@ class GerritRest(object):
 
     def put(func):
         @wraps(func)
-        def decorator_put(self, payload=None, headers=None, **kwargs):
-            url = func(self, payload, headers=headers)
-            headers = headers or self.session.headers
-            headers["content-type"] = "application/json"
+        def decorator_put(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
+            url = func(self, payload, headers=headers, *args, **kwargs)
+            headers = self.session.headers.update(headers)
             res = self.session.put(url, payload, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
@@ -37,10 +36,9 @@ class GerritRest(object):
 
     def post(func):
         @wraps(func)
-        def decorator_post(self, payload=None, headers=None, **kwargs):
-            url = func(self, payload, headers=headers)
-            headers = headers or self.session.headers
-            headers["content-type"] = "application/json"
+        def decorator_post(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
+            url = func(self, payload, headers=headers, *args, **kwargs)
+            headers = self.session.headers.update(headers)
             res = self.session.post(url, json.dumps(payload), headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
@@ -49,10 +47,9 @@ class GerritRest(object):
 
     def delete(func):
         @wraps(func)
-        def decorator_delete(self, *args, **kwargs):
-            url = func(self, *args, **kwargs)
-            self.session.headers["Accept"] = "application/json"
-            res = self.session.delete(url, verify=self.kwargs["verify"], params=kwargs)
+        def decorator_delete(self, headers={"Accept":"application/json"}, *args, **kwargs):
+            url = func(self, headers=headers, *args, **kwargs)
+            res = self.session.delete(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
             return res
