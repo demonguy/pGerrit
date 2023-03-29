@@ -1,6 +1,9 @@
 import requests
 from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
+import requests_cache
+
+requests_cache.install_cache(expire_after=900)
 
 class GerritClient(object):
     """Interface to the Gerrit REST API.
