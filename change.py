@@ -277,9 +277,9 @@ class GerritChangeRevisionFile(GerritChangeRevision):
             return False
 
     @GerritRest.get
-    def get_history_log(self, *args, **kwargs):
+    def get_history_log(self, commit=None, *args, **kwargs):
         project = self.info().project
-        commit = self.commit().commit
+        commit = commit or self.commit().commit
         return urljoin(self.host, "a/plugins", "gitiles", project, "+log", commit, self.fileID)
 
     @GerritRest.put
