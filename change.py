@@ -24,7 +24,7 @@ class GerritChange(GerritClient):
 
     @GerritRest.get
     def query(self, *args, **kwargs):
-        return urljoin(self.host, "/a/changes/")
+        return urljoin(self.host, urlformat(GerritChange._endpoint, ""))
 
     @GerritRest.get
     def info(self, *args, **kwargs):
@@ -121,7 +121,7 @@ class GerritChangeRevision(GerritChange):
         adapter. See
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
-    _endpoint ="/a/changes/{}/revisions/{}"
+    _endpoint = "/a/changes/{}/revisions/{}"
     _args = ["id", "revisionID"]
 
     def __init__(self, host, gerritID, revisionID, auth=None, verify=True, adapter=None):
@@ -229,7 +229,7 @@ class GerritChangeRevisionReviewer(GerritChangeRevision):
         adapter. See
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
-    _endpoint ="/a/changes/{}/revisions/{}/reviewers/{}"
+    _endpoint = "/a/changes/{}/revisions/{}/reviewers/{}"
     _args = ["id", "accountID", "revisionID", "accountID"]
 
     def __init__(self, host, gerritID, revisionID, accountID, auth=None, verify=True, adapter=None):
@@ -243,7 +243,6 @@ class GerritChangeRevisionReviewer(GerritChangeRevision):
 
     @GerritRest.delete
     def delete_vote(self, label, *args, **kwargs):
-        print(urljoin(self.host, urlformat(self._endpoint, self.id, self.revisionID, self.accountID), "votes", label))
         return urljoin(self.host, urlformat(self._endpoint, self.id, self.revisionID, self.accountID), "votes", label)
 
 

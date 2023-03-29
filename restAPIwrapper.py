@@ -14,6 +14,7 @@ class GerritRest(object):
         @wraps(func)
         def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
             url = func(self, headers=headers, *args, **kwargs)
+            url = url if self.session.auth else url.replace("/a/", "/")
             headers = self.session.headers.update(headers)
             res = self.session.get(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")
@@ -27,6 +28,7 @@ class GerritRest(object):
         @wraps(func)
         def decorator_put(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
+            url = url if self.session.auth else url.replace("/a/", "/")
             headers = self.session.headers.update(headers)
             res = self.session.put(url, payload, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
@@ -38,6 +40,7 @@ class GerritRest(object):
         @wraps(func)
         def decorator_post(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
+            url = url if self.session.auth else url.replace("/a/", "/")
             headers = self.session.headers.update(headers)
             res = self.session.post(url, json.dumps(payload), headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
@@ -49,6 +52,7 @@ class GerritRest(object):
         @wraps(func)
         def decorator_delete(self, headers={"Accept":"application/json"}, *args, **kwargs):
             url = func(self, headers=headers, *args, **kwargs)
+            url = url if self.session.auth else url.replace("/a/", "/")
             res = self.session.delete(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
