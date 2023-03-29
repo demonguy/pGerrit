@@ -47,3 +47,7 @@ class GerritClient(object):
     def change(self, gerritID):
         from Gerrit.change import GerritChange
         return GerritChange(self.host, gerritID, **self.kwargs)
+
+    def access(self):
+        from Gerrit.Access import GerritAccess
+        return GerritAccess(self.host, **self.kwargs)
