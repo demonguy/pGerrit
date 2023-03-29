@@ -1,7 +1,7 @@
 from functools import wraps
 import requests
 from types import SimpleNamespace
-from Gerrit.utils import urljoin
+from Gerrit.utils import urljoin, urlformat
 
 
 class GerritRest(object):
@@ -41,3 +41,19 @@ class GerritRest(object):
             # des.resultType
             return res
         return decorator_post
+
+    def url_wrapper(func):
+        @wraps(func)
+        def decorator_url(self):
+            from Gerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile
+            name = func.__name__
+            # find the class defined the method
+            cls_d = eval(func.__qualname__.split(".")[-2])
+            # extend all arguments which need to be inserted into endpoint
+            args = []
+            for arg_name in cls_d._args:
+                args.append(getattr(self, arg_name))
+
+            return urljoin(self.host, urlformat(cls_d._endpoint, *args), name)
+        return decorator_url
+

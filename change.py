@@ -15,6 +15,7 @@ class GerritChange(GerritClient):
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
     _endpoint = "/a/changes/{}"
+    _args = ["id"]
 
     def __init__(self, host, gerritID, auth=None, verify=True, adapter=None):
         """See class docstring."""
@@ -43,48 +44,58 @@ class GerritChange(GerritClient):
             return False
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def detail(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/detail")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def topic(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/topic")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def submitted_together(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/submitted_together")
+        pass
 
     @GerritRest.get
     def _in(self, *args, **kwargs):
         return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/in")
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def comments(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/comments")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def drafts(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/drafts")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def check(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/check")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def edit(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/edit")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def reviewers(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/reviewers")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def suggest_reviewers(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/suggest_reviewers")
+        pass
 
     @GerritRest.post
+    @GerritRest.url_wrapper
     def edit_publish(self, payload=None, headers=None):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/edit:publish")
+        pass
 
 class GerritChangeRevision(GerritChange):
     """Interface to the Gerrit REST API.
@@ -100,6 +111,7 @@ class GerritChangeRevision(GerritChange):
         https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
     """
     _endpoint ="/a/changes/{}/revisions/{}"
+    _args = ["id", "revisionID"]
 
     def __init__(self, host, gerritID, revisionID, auth=None, verify=True, adapter=None):
         """See class docstring."""
@@ -107,44 +119,54 @@ class GerritChangeRevision(GerritChange):
         self.revisionID = revisionID
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def commit(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/commit")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def actions(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/actions")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def review(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/review")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def related(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/related")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def patch(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/patch")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def mergeable(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/mergeable")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def submit_type(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/submit_type")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def drafts(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/drafts")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def comments(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/comments")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def files(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevision._endpoint, self.id, self.revisionID), "/files")
+        pass
 
     def file(self, fileID):
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
@@ -168,26 +190,31 @@ class GerritChangeRevision(GerritChange):
 class GerritChangeRevisionFile(GerritChangeRevision):
     """docstring for GerritChangeRevisionFile"""
     _endpoint = "/a/changes/{}/revisions/{}/files/{}"
+    _args = ["id", "revisionID", "fileID"]
 
     def __init__(self, host, gerritID, revisionID, fileID, auth=None, verify=True, adapter=None):
         super(GerritChangeRevisionFile, self).__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
         self.fileID = fileID
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def content(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevisionFile._endpoint, self.id, self.revisionID, self.fileID), "/content")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def diff(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevisionFile._endpoint, self.id, self.revisionID, self.fileID), "/diff")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def download(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevisionFile._endpoint, self.id, self.revisionID, self.fileID), "/download")
+        pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper
     def blame(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChangeRevisionFile._endpoint, self.id, self.revisionID, self.fileID), "/blame")
+        pass
 
     def is_binary(self):
         file_info = getattr(self.files(), self.fileID)
