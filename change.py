@@ -113,7 +113,7 @@ class GerritChangeRevisionFile(GerritChangeRevision):
 
     @GerritRest.get
     def diff(self, *args, **kwargs):
-        return urljoin(self.url, "/diff")
+        return urljoin(self.fileUrl, "/diff")
 
     def is_binary(self):
         file_info = getattr(self.files(), self.fileID)
