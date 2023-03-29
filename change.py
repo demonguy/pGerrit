@@ -106,3 +106,14 @@ class GerritChangeRevisionFile(GerritChangeRevision):
     @GerritRest.get
     def content(self, *args, **kwargs):
         return urljoin(self.url, "/content")
+
+    @GerritRest.get
+    def diff(self, *args, **kwargs):
+        return urljoin(self.url, "/diff")
+
+    def is_binary(self):
+        diff = self.diff()
+        if hasattr(diff, "binary") and diff.binary == True:
+            return True
+        else:
+            return False
