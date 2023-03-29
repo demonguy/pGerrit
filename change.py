@@ -59,8 +59,9 @@ class GerritChange(GerritClient):
         pass
 
     @GerritRest.get
+    @GerritRest.url_wrapper("in")
     def _in(self, *args, **kwargs):
-        return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/in")
+        pass
 
     @GerritRest.get
     @GerritRest.url_wrapper()
