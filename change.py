@@ -108,6 +108,11 @@ class GerritChange(GerritClient):
     def edit_publish(self, payload=None, headers=None):
         pass
 
+    @GerritRest.post
+    @GerritRest.url_wrapper("edit")
+    def edit_restore(self, payload=None, headers=None):
+        pass
+
     @GerritRest.delete
     @GerritRest.url_wrapper("edit")
     def edit_delete(self, payload=None, headers=None):
@@ -304,4 +309,5 @@ class GerritChangeRevisionFile(GerritChangeRevision):
 
     @GerritRest.get
     def edit_retrieve(self, headers=None):
-        return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
+        return urljoin(self.host, "/a/changes/", self.id, "/edit/", urlformat("{}", self.fileID))
+
