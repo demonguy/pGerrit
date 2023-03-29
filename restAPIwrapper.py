@@ -16,7 +16,10 @@ class GerritRest(object):
             res = self.session.get(url, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
-            return res.json(object_hook=lambda d: SimpleNamespace(**d))
+            try:
+                return res.json(object_hook=lambda d: SimpleNamespace(**d))
+            except Exception as e:
+                raise RuntimeError(e.__class__.__name__ + " raised, server response:" + str(res.content))
         return decorator_get
 
     def put(func):
