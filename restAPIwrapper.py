@@ -2,6 +2,7 @@ from functools import wraps
 import requests
 from types import SimpleNamespace
 from Gerrit.utils import urljoin, urlformat
+from Gerrit.exception import GerritError
 import json
 
 
@@ -16,11 +17,10 @@ class GerritRest(object):
             self.session.headers["Accept"] = "application/json"
             res = self.session.get(url, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")
-            # des.resultType
-            try:
-                return res.json(object_hook=lambda d: SimpleNamespace(**d))
-            except Exception as e:
-                raise RuntimeError(e.__class__.__name__ + " raised\nserver response:" + str(res.content) + "\nurl:" + url)
+            if res.status_code != 200:
+                raise GerritError(res.status_code, res.content)
+            return res.json(object_hook=lambda d: SimpleNamespace(**d))
+
         return decorator_get
 
     def put(func):
