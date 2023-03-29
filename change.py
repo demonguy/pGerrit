@@ -99,6 +99,11 @@ class GerritChange(GerritClient):
         pass
 
     @GerritRest.post
+    @GerritRest.url_wrapper()
+    def rebase(self, payload=None, headers=None):
+        pass
+
+    @GerritRest.post
     @GerritRest.url_wrapper("edit:publish")
     def edit_publish(self, payload=None, headers=None):
         pass
