@@ -1,0 +1,82 @@
+# class HTTPCall(object):
+#     """docstring for HTTPCall"""
+#     def __init__(self):
+#         super(HTTPCall, self).__init__()
+#         self._post = False
+#         self._put = False
+#         self._delete = False
+
+#     # def __get__(self, instance, owner):
+#     #     print("__get__")
+#     #     return
+
+#     def __call__(self, *args, **kwargs):
+#         print("__call__")
+
+#     def __set__(self, instance, value):
+#         if self._put:
+#             print("__set__")
+#             return
+#         else:
+#             print("__set__ error!")
+
+#     def __add__(self, other):
+#         if self._post:
+#             print("__add__")
+#             return
+#         else:
+#             print("__add__ error!")
+
+#     def __sub__(self, other):
+#         if self._delete:
+#             print("__sub__")
+#             return
+#         else:
+#             print("__sub__ error!")
+
+#     def post(self, func):
+#         self._post = True
+#         return self
+
+#     def put(self, func):
+#         self._put = True
+#         return self
+
+#     def delete(self, func):
+#         self._delete = True
+#         return self
+
+
+# class RestAPI(object):
+#     """docstring for RestAPI"""
+#     def __init__(self):
+#         super(RestAPI, self).__init__()
+
+#     def __call__(self, func):
+#         return HTTPCall()
+
+
+
+
+
+
+
+
+# class test(object):
+#     """docstring for test"""
+#     def __init__(self):
+#         super(test, self).__init__()
+        
+#     @RestAPI()
+#     def t(self):
+#         pass
+
+#     @t.post
+#     def t(self):
+#         pass
+
+
+# test().t = 123 #PUT
+# test().t + 123 #POST
+# test().t - 123 #DELETE
+# test().t() #GET
