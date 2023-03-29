@@ -3,3 +3,7 @@ __pycache__
 cache.sqlite
 http_cache.sqlite
 .idea/
+build/
+dist/
+pGerrit.egg-info/
+p.egg-info/
