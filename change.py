@@ -161,7 +161,7 @@ class GerritChangeRevision(GerritChange):
 
     @GerritRest.post
     @GerritRest.url_wrapper("review")
-    def set_review(self, *args, **kwargs):
+    def set_review(self, payload=None, headers=None):
         pass
 
     @GerritRest.get
@@ -197,6 +197,11 @@ class GerritChangeRevision(GerritChange):
     @GerritRest.get
     @GerritRest.url_wrapper()
     def files(self, *args, **kwargs):
+        pass
+
+    @GerritRest.post
+    @GerritRest.url_wrapper()
+    def cherrypick(self, payload=None, headers=None):
         pass
 
     def file(self, fileID):
