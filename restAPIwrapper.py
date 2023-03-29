@@ -64,7 +64,7 @@ class GerritRest(object):
             @wraps(func)
             def decorator_url(self, *args, **kwargs):
                 from Gerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile
-                name = end or func.__name__
+                name = end if end != None else func.__name__
                 # find the class defined the method
                 cls_d = eval(func.__qualname__.split(".")[-2])
                 # extend all arguments which need to be inserted into endpoint

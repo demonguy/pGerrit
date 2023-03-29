@@ -108,6 +108,11 @@ class GerritChange(GerritClient):
     def edit_delete(self, payload=None, headers=None):
         pass
 
+    @GerritRest.delete
+    @GerritRest.url_wrapper("")
+    def delete_change(self, payload=None, headers=None):
+        pass
+
 class GerritChangeRevision(GerritChange):
     """Interface to the Gerrit REST API.
     :arg str url: The full URL to the server, including the `http(s)://`
