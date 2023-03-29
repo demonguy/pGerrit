@@ -2,6 +2,7 @@ from functools import wraps
 import requests
 from types import SimpleNamespace
 from Gerrit.utils import urljoin, urlformat
+import json
 
 
 class GerritRest(object):
@@ -36,24 +37,28 @@ class GerritRest(object):
         @wraps(func)
         def decorator_post(self, payload=None, headers=None, **kwargs):
             url = func(self, payload, headers=headers)
-            res = self.session.post(url, payload, headers=headers, verify=self.kwargs["verify"], params=kwargs)
+            headers = headers or self.session.headers
+            headers["Content-Type"] = "application/json"
+            res = self.session.post(url, json.dumps(payload), headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
             return res
         return decorator_post
 
-    def url_wrapper(func):
-        @wraps(func)
-        def decorator_url(self):
-            from Gerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile
-            name = func.__name__
-            # find the class defined the method
-            cls_d = eval(func.__qualname__.split(".")[-2])
-            # extend all arguments which need to be inserted into endpoint
-            args = []
-            for arg_name in cls_d._args:
-                args.append(getattr(self, arg_name))
+    def url_wrapper(end=None):
+        def wrapper(func):
+            @wraps(func)
+            def decorator_url(self, *args, **kwargs):
+                from Gerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile
+                name = end or func.__name__
+                # find the class defined the method
+                cls_d = eval(func.__qualname__.split(".")[-2])
+                # extend all arguments which need to be inserted into endpoint
+                args = []
+                for arg_name in cls_d._args:
+                    args.append(getattr(self, arg_name))
 
-            return urljoin(self.host, urlformat(cls_d._endpoint, *args), name)
-        return decorator_url
+                return urljoin(self.host, urlformat(cls_d._endpoint, *args), name)
+            return decorator_url
+        return wrapper
 

@@ -44,17 +44,17 @@ class GerritChange(GerritClient):
             return False
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def detail(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def topic(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def submitted_together(self, *args, **kwargs):
         pass
 
@@ -63,37 +63,42 @@ class GerritChange(GerritClient):
         return urljoin(self.host, urlformat(GerritChange._endpoint, self.id), "/in")
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def comments(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
+    def robotcomments(self, *args, **kwargs):
+        pass
+
+    @GerritRest.get
+    @GerritRest.url_wrapper()
     def drafts(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def check(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def edit(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def reviewers(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def suggest_reviewers(self, *args, **kwargs):
         pass
 
     @GerritRest.post
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def edit_publish(self, payload=None, headers=None):
         pass
 
@@ -119,52 +124,57 @@ class GerritChangeRevision(GerritChange):
         self.revisionID = revisionID
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def commit(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def actions(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def review(self, *args, **kwargs):
         pass
 
+    @GerritRest.post
+    @GerritRest.url_wrapper("review")
+    def set_review(self, *args, **kwargs):
+        pass
+
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def related(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def patch(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def mergeable(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def submit_type(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def drafts(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def comments(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def files(self, *args, **kwargs):
         pass
 
@@ -187,6 +197,12 @@ class GerritChangeRevision(GerritChange):
                     remote = {"id":info._number, "revision":parent.commit}
             return (local, remote)
 
+    @GerritRest.get
+    def get_history_log(self):
+        project = self.info().project
+        commit = self.commit().commit
+        return urljoin(self.host, "a/plugins", "gitiles", project, "+", commit)
+
 class GerritChangeRevisionFile(GerritChangeRevision):
     """docstring for GerritChangeRevisionFile"""
     _endpoint = "/a/changes/{}/revisions/{}/files/{}"
@@ -197,22 +213,22 @@ class GerritChangeRevisionFile(GerritChangeRevision):
         self.fileID = fileID
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def content(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def diff(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def download(self, *args, **kwargs):
         pass
 
     @GerritRest.get
-    @GerritRest.url_wrapper
+    @GerritRest.url_wrapper()
     def blame(self, *args, **kwargs):
         pass
 
