@@ -1,6 +1,6 @@
-from restAPIwrapper import GerritRest
-from client import GerritClient
-from utils import urljoin
+from Gerrit.restAPIwrapper import GerritRest
+from Gerrit.client import GerritClient
+from Gerrit.utils import urljoin, urlformat
 
 class GerritChange(GerritClient):
     """Interface to the Gerrit REST API.
@@ -19,7 +19,7 @@ class GerritChange(GerritClient):
         """See class docstring."""
         super().__init__(host, auth=auth, verify=verify, adapter=adapter)
         self.id = gerritID
-        self._endpoint = "/a/changes/{}".format(self.id)
+        self._endpoint = urlformat("/a/changes/{}", self.id)
         self.url = urljoin(self.host, self._endpoint)
 
     @GerritRest.get
@@ -65,7 +65,7 @@ class GerritChangeRevision(GerritChange):
         """See class docstring."""
         super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter)
         self.revisionID = revisionID
-        self._endpoint = "/a/changes/{}/revisions/{}".format(self.id, self.revisionID)
+        self._endpoint = urlformat("/a/changes/{}/revisions/{}", self.id, self.revisionID)
         self.url = urljoin(self.host, self._endpoint)
 
     @GerritRest.get
@@ -79,12 +79,28 @@ class GerritChangeRevision(GerritChange):
     def file(self, fileID):
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
 
+    def getParentInfo(self):
+        # assume there are only 1 or 2 parents
+        current_info = self.query(q=self.commit().commit)[0]
+        if len(self.commit().parents) == 1:
+            parent = self.commit().parents[0]
+            info = self.query(q=parent.commit)[0]
+            return ({"id":info._number, "revision":parent.commit}, None)
+        else:
+            for parent in self.commit().parents:
+                info = self.query(q=parent.commit)[0]
+                if info.branch == current_info.branch:
+                    local = {"id":info._number, "revision":parent.commit}
+                else:
+                    remote = {"id":info._number, "revision":parent.commit}
+            return (local, remote)
+
 class GerritChangeRevisionFile(GerritChangeRevision):
     """docstring for GerritChangeRevisionFile"""
     def __init__(self, host, gerritID, revisionID, fileID, auth=None, verify=True, adapter=None):
         super(GerritChangeRevisionFile, self).__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
         self.fileID = fileID
-        self._endpoint = "/a/changes/{}/revisions/{}/files/{}".format(self.id, self.revisionID, self.fileID)
+        self._endpoint = urlformat("/a/changes/{}/revisions/{}/files/{}", self.id, self.revisionID, self.fileID)
         self.url = urljoin(self.host, self._endpoint)
 
     @GerritRest.get

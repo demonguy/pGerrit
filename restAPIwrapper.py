@@ -1,7 +1,7 @@
 from functools import wraps
 import requests
 from types import SimpleNamespace
-from utils import urljoin
+from Gerrit.utils import urljoin
 
 
 class GerritRest(object):
@@ -12,6 +12,7 @@ class GerritRest(object):
         @wraps(func)
         def decorator_get(self, *args, **kwargs):
             url = func(self)
+            print(url)
             self.session.headers["Accept"] = "application/json"
             res = self.session.get(url, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")

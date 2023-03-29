@@ -1,6 +1,5 @@
 import requests
 from requests.packages.urllib3.util import Retry
-from requests.auth import HTTPDigestAuth
 from requests.adapters import HTTPAdapter
 
 class GerritClient(object):
@@ -40,5 +39,5 @@ class GerritClient(object):
             self.host += "/"
 
     def change(self, gerritID):
-        from change import GerritChange
+        from Gerrit.change import GerritChange
         return GerritChange(self.host, gerritID, **self.kwargs)
