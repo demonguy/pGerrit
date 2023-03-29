@@ -1,8 +1,9 @@
 from pGerrit.restAPIwrapper import GerritRest
 from pGerrit.client import GerritClient
 from pGerrit.utils import urljoin, urlformat
+from pGerrit.queryMeta import QueryMeta
 
-class GerritAccess(GerritClient):
+class GerritAccess(GerritClient, metaclass=QueryMeta):
     """Interface to the Gerrit REST API.
     :arg str url: The full URL to the server, including the `http(s)://`
         prefix.

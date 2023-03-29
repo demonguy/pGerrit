@@ -23,6 +23,7 @@ class GerritClient(object):
         """See class docstring."""
         self.host = host
         self.session = requests.session()
+        self.verify = verify
         if not adapter:
             retry = Retry(
                 total=5,
@@ -35,6 +36,7 @@ class GerritClient(object):
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
         self.session.auth = auth
+        self.adapter = adapter
 
         self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter}
 
@@ -44,10 +46,12 @@ class GerritClient(object):
     def __del__(self):
         self.session.close()
 
-    def change(self, gerritID):
+    @property
+    def change(self):
         from pGerrit.change import GerritChange
-        return GerritChange(self.host, gerritID, **self.kwargs)
+        return GerritChange(self.host, gerritID=None, auth=self.session.auth, verify=self.verify, adapter=self.adapter)
 
+    @property
     def access(self):
         from pGerrit.Access import GerritAccess
-        return GerritAccess(self.host, **self.kwargs)
+        return GerritAccess(self.host, auth=self.session.auth, verify=self.verify, adapter=self.adapter)

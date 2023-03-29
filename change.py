@@ -1,8 +1,9 @@
 from pGerrit.restAPIwrapper import GerritRest
 from pGerrit.client import GerritClient
 from pGerrit.utils import urljoin, urlformat
+from pGerrit.queryMeta import QueryMeta
 
-class GerritChange(GerritClient):
+class GerritChange(GerritClient, metaclass=QueryMeta):
     """Interface to the Gerrit REST API.
     :arg str url: The full URL to the server, including the `http(s)://`
         prefix.
@@ -17,7 +18,7 @@ class GerritChange(GerritClient):
     _endpoint = "/a/changes/{}"
     _args = ["id"]
 
-    def __init__(self, host, gerritID, auth=None, verify=True, adapter=None):
+    def __init__(self, host, gerritID=None, auth=None, verify=True, adapter=None):
         """See class docstring."""
         super().__init__(host, auth=auth, verify=verify, adapter=adapter)
         self.id = gerritID
