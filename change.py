@@ -223,6 +223,12 @@ class GerritChangeRevisionFile(GerritChangeRevision):
         else:
             return False
 
+    @GerritRest.get
+    def get_history_log(self):
+        project = self.info().project
+        commit = self.commit().commit
+        return urljoin(self.host, "a/plugins", "gitiles", project, "+log", commit, self.fileID)
+
     @GerritRest.put
     def edit(self, payload, headers=None):
         return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
