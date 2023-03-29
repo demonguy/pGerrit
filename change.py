@@ -53,6 +53,11 @@ class GerritChange(GerritClient):
     def topic(self, *args, **kwargs):
         pass
 
+    @GerritRest.put
+    @GerritRest.url_wrapper("topic")
+    def set_topic(self, *args, **kwargs):
+        pass
+
     @GerritRest.get
     @GerritRest.url_wrapper()
     def submitted_together(self, *args, **kwargs):
