@@ -198,11 +198,16 @@ class GerritChangeRevision(GerritChange):
                     remote = {"id":info._number, "revision":parent.commit}
             return (local, remote)
 
-    @GerritRest.get
-    def get_history_log(self):
-        project = self.info().project
-        commit = self.commit().commit
-        return urljoin(self.host, "a/plugins", "gitiles", project, "+", commit)
+    def format_git_log(self):
+        pattern = "commit {}\n"\
+                  "Author: {} <{}>\n"\
+                  "Date: {}\n"\
+                  "{}\n"\
+                  "\n"
+
+        commit = self.commit()
+        return pattern.format(commit.commit, commit.author.name, commit.author.email, commit.author.date, commit.message)
+
 
 class GerritChangeRevisionFile(GerritChangeRevision):
     """docstring for GerritChangeRevisionFile"""
