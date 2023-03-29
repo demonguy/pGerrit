@@ -117,3 +117,7 @@ class GerritChangeRevisionFile(GerritChangeRevision):
             return True
         else:
             return False
+
+    @GerritRest.put
+    def edit(self, payload, headers=None):
+        return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
