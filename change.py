@@ -210,32 +210,6 @@ class GerritChangeRevision(GerritChange):
     def reviwer(self, accountID):
         return GerritChangeRevisionReviewer(self.host, self.id, self.revisionID, accountID, **self.kwargs)
 
-    def getParentInfo(self):
-        # assume there are only 1 or 2 parents
-        current_info = self.query(q=self.commit().commit)[0]
-        if len(self.commit().parents) == 1:
-            parent = self.commit().parents[0]
-            info = self.query(q=parent.commit)[0]
-            return ({"id":info._number, "revision":parent.commit}, None)
-        else:
-            for parent in self.commit().parents:
-                info = self.query(q=parent.commit)[0]
-                if info.branch == current_info.branch:
-                    local = {"id":info._number, "revision":parent.commit}
-                else:
-                    remote = {"id":info._number, "revision":parent.commit}
-            return (local, remote)
-
-    def format_git_log(self):
-        pattern = "commit {}\n"\
-                  "Author: {} <{}>\n"\
-                  "Date: {}\n"\
-                  "{}\n"\
-                  "\n"
-
-        commit = self.commit()
-        return pattern.format(commit.commit, commit.author.name, commit.author.email, commit.author.date, commit.message)
-
 class GerritChangeRevisionReviewer(GerritChangeRevision):
     """Interface to the Gerrit REST API.
     :arg str url: The full URL to the server, including the `http(s)://`
