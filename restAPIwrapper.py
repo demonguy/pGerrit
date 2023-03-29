@@ -19,7 +19,7 @@ class GerritRest(object):
             try:
                 return res.json(object_hook=lambda d: SimpleNamespace(**d))
             except Exception as e:
-                raise RuntimeError(e.__class__.__name__ + " raised, server response:" + str(res.content))
+                raise RuntimeError(e.__class__.__name__ + " raised\nserver response:" + str(res.content) + "\nurl:" + url)
         return decorator_get
 
     def put(func):
