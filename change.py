@@ -93,6 +93,11 @@ class GerritChange(GerritClient):
     def reviewers(self, *args, **kwargs):
         pass
 
+    @GerritRest.post
+    @GerritRest.url_wrapper("reviewers")
+    def add_reviewer(self, *args, **kwargs):
+        pass
+
     @GerritRest.get
     @GerritRest.url_wrapper()
     def suggest_reviewers(self, *args, **kwargs):
