@@ -20,7 +20,7 @@ class GerritChange(GerritClient):
         super().__init__(host, auth=auth, verify=verify, adapter=adapter)
         self.id = gerritID
         self._endpoint = urlformat("/a/changes/{}", self.id)
-        self.url = urljoin(self.host, self._endpoint)
+        self.changeUrl = urljoin(self.host, self._endpoint)
 
     @GerritRest.get
     def query(self, *args, **kwargs):
@@ -28,11 +28,11 @@ class GerritChange(GerritClient):
 
     @GerritRest.get
     def detail(self, *args, **kwargs):
-        return urljoin(self.url, "/detail")
+        return urljoin(self.changeUrl, "/detail")
 
     @GerritRest.get
     def info(self, *args, **kwargs):
-        return self.url
+        return self.changeUrl
 
     def revision(self, revisionID):
         return GerritChangeRevision(self.host, self.id, revisionID, **self.kwargs)
@@ -46,6 +46,10 @@ class GerritChange(GerritClient):
             return True
         else:
             return False
+
+    @GerritRest.post
+    def edit_publish(self, payload=None, headers=None):
+        return urljoin(self.changeUrl, "/edit:publish")
 
 class GerritChangeRevision(GerritChange):
     """Interface to the Gerrit REST API.
@@ -66,15 +70,15 @@ class GerritChangeRevision(GerritChange):
         super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter)
         self.revisionID = revisionID
         self._endpoint = urlformat("/a/changes/{}/revisions/{}", self.id, self.revisionID)
-        self.url = urljoin(self.host, self._endpoint)
+        self.revisionUrl = urljoin(self.host, self._endpoint)
 
     @GerritRest.get
     def files(self, *args, **kwargs):
-        return urljoin(self.url, "/files")
+        return urljoin(self.revisionUrl, "/files")
 
     @GerritRest.get
     def commit(self, *args, **kwargs):
-        return urljoin(self.url, "/commit")
+        return urljoin(self.revisionUrl, "/commit")
 
     def file(self, fileID):
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
@@ -101,19 +105,19 @@ class GerritChangeRevisionFile(GerritChangeRevision):
         super(GerritChangeRevisionFile, self).__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
         self.fileID = fileID
         self._endpoint = urlformat("/a/changes/{}/revisions/{}/files/{}", self.id, self.revisionID, self.fileID)
-        self.url = urljoin(self.host, self._endpoint)
+        self.fileUrl = urljoin(self.host, self._endpoint)
 
     @GerritRest.get
     def content(self, *args, **kwargs):
-        return urljoin(self.url, "/content")
+        return urljoin(self.fileUrl, "/content")
 
     @GerritRest.get
     def diff(self, *args, **kwargs):
         return urljoin(self.url, "/diff")
 
     def is_binary(self):
-        diff = self.diff()
-        if hasattr(diff, "binary") and diff.binary == True:
+        file_info = getattr(self.files(), self.fileID)
+        if hasattr(file_info, "binary") and file_info.binary == True:
             return True
         else:
             return False
