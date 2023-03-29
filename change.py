@@ -300,7 +300,7 @@ class GerritChangeRevisionFile(GerritChangeRevision):
 
     @GerritRest.put
     def edit(self, payload, headers=None):
-        return urljoin(self.host, "/a/changes/", self.id, "/edit/", self.fileID)
+        return urljoin(self.host, "/a/changes/", self.id, "/edit/", urlformat("{}", self.fileID))
 
     @GerritRest.get
     def edit_retrieve(self, headers=None):

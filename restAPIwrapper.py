@@ -15,7 +15,6 @@ class GerritRest(object):
         def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
             url = func(self, headers=headers, *args, **kwargs)
             url = url if self.session.auth else url.replace("/a/", "/")
-            headers = self.session.headers.update(headers)
             res = self.session.get(url, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             res._content = res._content.replace(b")]}'\n", b"")
             if res.status_code != 200:
@@ -29,7 +28,6 @@ class GerritRest(object):
         def decorator_put(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
             url = url if self.session.auth else url.replace("/a/", "/")
-            headers = self.session.headers.update(headers)
             res = self.session.put(url, payload, headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
@@ -41,7 +39,6 @@ class GerritRest(object):
         def decorator_post(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
             url = url if self.session.auth else url.replace("/a/", "/")
-            headers = self.session.headers.update(headers)
             res = self.session.post(url, json.dumps(payload), headers=headers, verify=self.kwargs["verify"], params=kwargs)
             # res._content = res._content.replace(b")]}'\n", b"")
             # des.resultType
