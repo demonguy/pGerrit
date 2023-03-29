@@ -106,4 +106,3 @@ class GerritChangeRevisionFile(GerritChangeRevision):
     @GerritRest.get
     def content(self, *args, **kwargs):
         return urljoin(self.url, "/content")
-        
