@@ -106,6 +106,16 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
 
     @GerritRest.get()
     @GerritRest.url_wrapper()
+    def hashtags(self, *args, **kwargs):
+        pass
+
+    @GerritRest.post
+    @GerritRest.url_wrapper("hashtags")
+    def set_hashtags(self, *args, **kwargs):
+        pass
+
+    @GerritRest.get()
+    @GerritRest.url_wrapper()
     def suggest_reviewers(self, *args, **kwargs):
         pass
 
