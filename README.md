@@ -74,4 +74,4 @@ To find out more about what you can do with pGerrit, see:
 
 * [Quick Start](https://pgerrit.readthedocs.io/en/latest/user/quickstart/)
 * [Advanced Usage](https://pgerrit.readthedocs.io/en/latest/user/advanced/)
-* [API Reference](https://pgerrit.readthedocs.io/end/latest/reference.html)
+* [API Reference](https://pgerrit.readthedocs.io/en/latest/api/)
