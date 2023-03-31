@@ -15,9 +15,9 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
     _endpoint = "/a/changes/{}"
     _args = ["id"]
 
-    def __init__(self, host, gerritID=None, auth=None, verify=True, adapter=None):
+    def __init__(self, host, gerritID=None, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
-        super().__init__(host, auth=auth, verify=verify, adapter=adapter)
+        super().__init__(host, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.id = gerritID
 
     @GerritRest.get()
@@ -61,28 +61,6 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
 
         """
         return urljoin(self.host, urlformat(GerritChange._endpoint, self.id))
-
-    def revision(self, revisionID):
-        """Creates a GerritChangeRevision object for a specific revision of the change.
-
-        :param revisionID: The `revision ID <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#ids>`__ (commit SHA1 or numeric ID)
-
-        Usage::
-
-            change_revision = change.revision(revisionID)
-
-        """
-        return GerritChangeRevision(self.host, self.id, revisionID, **self.kwargs)
-
-    def current_revision(self):
-        """Creates a GerritChangeRevision object for the current revision of the change.
-
-        Usage::
-
-            current_revision = change.current_revision()
-
-        """
-        return GerritChangeRevision(self.host, self.id, "current", **self.kwargs)
 
     def is_merge(self):
         """Checks if the change is a merge change.
@@ -458,6 +436,28 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
         """
         pass
 
+    def revision(self, revisionID):
+        """Creates a GerritChangeRevision object for a specific revision of the change.
+
+        :param revisionID: The `revision ID <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#ids>`__ (commit SHA1 or numeric ID)
+
+        Usage::
+
+            change_revision = change.revision(revisionID)
+
+        """
+        return GerritChangeRevision(self.host, self.id, revisionID, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
+
+    def current_revision(self):
+        """Creates a GerritChangeRevision object for the current revision of the change.
+
+        Usage::
+
+            current_revision = change.current_revision()
+
+        """
+        return GerritChangeRevision(self.host, self.id, "current", auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
+
 class GerritChangeRevision(GerritChange):
     """Class maps /a/changes/{change_id}/revisions/{revision_id} endpoint of Gerrit REST API
 
@@ -470,9 +470,9 @@ class GerritChangeRevision(GerritChange):
     _endpoint = "/a/changes/{}/revisions/{}"
     _args = ["id", "revisionID"]
 
-    def __init__(self, host, gerritID, revisionID, auth=None, verify=True, adapter=None):
+    def __init__(self, host, gerritID, revisionID, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
-        super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter)
+        super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.revisionID = revisionID
 
     @GerritRest.get()
@@ -704,7 +704,7 @@ class GerritChangeRevision(GerritChange):
             file_instance = revision.file(fileID)
 
         """
-        return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, **self.kwargs)
+        return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
 
     def reviwer(self, accountID):
         """Get the GerritChangeRevisionReviewer instance for a specific reviewer of the change revision.
@@ -719,7 +719,7 @@ class GerritChangeRevision(GerritChange):
             reviewer_instance = revision.reviewer(accountID)
 
         """
-        return GerritChangeRevisionReviewer(self.host, self.id, self.revisionID, accountID, **self.kwargs)
+        return GerritChangeRevisionReviewer(self.host, self.id, self.revisionID, accountID, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
 
 class GerritChangeRevisionReviewer(GerritChangeRevision):
     """Class maps /a/changes/{change_id}/revisions/{revision_id}/reviewers/{account_id} endpoint of Gerrit REST API
@@ -733,9 +733,9 @@ class GerritChangeRevisionReviewer(GerritChangeRevision):
     _endpoint = "/a/changes/{}/revisions/{}/reviewers/{}"
     _args = ["id", "accountID", "revisionID", "accountID"]
 
-    def __init__(self, host, gerritID, revisionID, accountID, auth=None, verify=True, adapter=None):
+    def __init__(self, host, gerritID, revisionID, accountID, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
-        super().__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
+        super().__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.accountID = accountID
 
     @GerritRest.get()
@@ -784,8 +784,8 @@ class GerritChangeRevisionFile(GerritChangeRevision):
     _endpoint = "/a/changes/{}/revisions/{}/files/{}"
     _args = ["id", "revisionID", "fileID"]
 
-    def __init__(self, host, gerritID, revisionID, fileID, auth=None, verify=True, adapter=None):
-        super(GerritChangeRevisionFile, self).__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter)
+    def __init__(self, host, gerritID, revisionID, fileID, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+        super().__init__(host, gerritID, revisionID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.fileID = fileID
 
     @GerritRest.get()

@@ -14,9 +14,9 @@ class GerritAccess(GerritClient, metaclass=QueryMeta):
     """
     _endpoint = "/a/access/{}"
 
-    def __init__(self, host, auth=None, verify=True, adapter=None):
+    def __init__(self, host, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
-        super().__init__(host, auth=auth, verify=verify, adapter=adapter)
+        super().__init__(host, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
 
     @GerritRest.get()
     def query(self, *args, **kwargs):

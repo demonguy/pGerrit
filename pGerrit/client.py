@@ -23,7 +23,7 @@ class GerritClient(object):
     :rtype: pGerrit.GerritClient
     """
 
-    def __init__(self, host, auth=None, cookies=None, verify=True, adapter=None, cache=True, cache_expire=3):
+    def __init__(self, host, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
         self.host = host
         if cache:
@@ -44,11 +44,11 @@ class GerritClient(object):
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
         self.adapter = adapter
+        self.cache = cache
+        self.cache_expire = cache_expire
 
         if auth:
             self.session.auth = auth
-        elif cookies:
-            self.session.cookies = cookies
 
         self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter}
 
@@ -76,7 +76,7 @@ class GerritClient(object):
         Notice that GerritChange class use QueryMeta as metaclass to make query as classmethod
         """
         from pGerrit.change import GerritChange
-        return GerritChange(self.host, gerritID=None, auth=self.session.auth, verify=self.verify, adapter=self.adapter)
+        return GerritChange(self.host, gerritID=None, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
 
     @property
     def access(self):
@@ -91,4 +91,4 @@ class GerritClient(object):
             access = gerrit_client.access.query(...)
         """
         from pGerrit.Access import GerritAccess
-        return GerritAccess(self.host, auth=self.session.auth, verify=self.verify, adapter=self.adapter)
+        return GerritAccess(self.host, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
