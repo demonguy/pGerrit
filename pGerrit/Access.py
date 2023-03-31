@@ -4,16 +4,13 @@ from pGerrit.utils import urljoin, urlformat
 from pGerrit.queryMeta import QueryMeta
 
 class GerritAccess(GerritClient, metaclass=QueryMeta):
-    """Interface to the Gerrit REST API.
-    :arg str url: The full URL to the server, including the `http(s)://`
-        prefix.
-    :arg auth: (optional) Authentication handler.  Must be derived from
-        `requests.auth.HTTPDigestAuth`.
-    :arg boolean verify: (optional) Set to False to disable verification of
-        SSL certificates.
-    :arg requests.adapters.BaseAdapter adapter: (optional) Custom connection
-        adapter. See
-        https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
+    """Class maps /access/ endpoint of Gerrit REST API
+
+    :return: An instance of GerritAccess.
+    :rtype: pGerrit.GerritAccess
+
+    You won't need to instantiate this Class directly.
+    Use ``pGerrit.GerritClient.access``
     """
     _endpoint = "/a/access/{}"
 
@@ -23,4 +20,17 @@ class GerritAccess(GerritClient, metaclass=QueryMeta):
 
     @GerritRest.get()
     def query(self, *args, **kwargs):
+        """Performs a GET request to query for access rights from the Gerrit API.
+
+        **API URL**: `/a/access/ <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#list-access>`__
+
+        **Input type**: `QueryOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#list-access>`__
+
+        **Return type**: Dict[`str`, `ProjectAccessInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#project-access-info>`__]
+
+        Usage::
+
+            access_rights = gerrit_access.query(**{"project": "All-Projects"})
+
+        """
         return urljoin(self.host, urlformat(GerritAccess._endpoint, ""))

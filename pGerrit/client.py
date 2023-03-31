@@ -4,17 +4,23 @@ from requests.adapters import HTTPAdapter
 import requests_cache
 
 class GerritClient(object):
-    """Interface to the Gerrit REST API.
-    :arg str url: The full URL to the server, including the `http(s)://`
-        prefix. If `auth` is given, `url` will be automatically adjusted to
-        include Gerrit's authentication suffix.
-    :arg auth: (optional) Authentication handler.  Must be derived from
-        `requests.auth.AuthBase`.
-    :arg boolean verify: (optional) Set to False to disable verification of
-        SSL certificates.
-    :arg requests.adapters.BaseAdapter adapter: (optional) Custom connection
-        adapter. See
-        https://requests.readthedocs.io/en/master/api/#requests.adapters.BaseAdapter
+    """
+    A class representing a Gerrit REST API client.
+
+    :param str host: The full URL to the server, including the `http(s)://` prefix.
+    :param auth: (optional) Authentication handler. Must be derived from `requests.auth.HTTPDigestAuth`.
+    :type auth: requests.auth.HTTPDigestAuth or None
+    :param cookies: (optional) Cookie jar to be used in the session.
+    :type cookies: requests.cookies.RequestsCookieJar or dict
+    :param bool verify: (optional) Set to False to disable verification of SSL certificates.
+    :param adapter: (optional) Custom connection adapter. Normally we use it to set `urllib3.util.Rety` object.
+                    By default, there is 5 times retry behaviour.
+    :type adapter: requests.adapters.BaseAdapter or None
+    :param bool cache: (optional) Set to True to enable cache support. Defaults to True.
+    :param int cache_expire: (optional) The number of seconds to expire the cache after. Defaults to 3.
+
+    :return: An instance of GerritClient.
+    :rtype: pGerrit.GerritClient
     """
 
     def __init__(self, host, auth=None, cookies=None, verify=True, adapter=None, cache=True, cache_expire=3):
@@ -54,10 +60,35 @@ class GerritClient(object):
 
     @property
     def change(self):
+        """Provides an instance of GerritChange for the given Gerrit client configuration.
+
+        :param str id: the Change-id of Gerrit
+
+        :return: An instance of GerritChange.
+        :rtype: pGerrit.change.GerritChange
+
+        Usage::
+
+            gerrit_client = GerritClient(...)
+            changes = gerrit_client.change.query(...)
+            change = gerrit_client.change(12345)
+
+        Notice that GerritChange class use QueryMeta as metaclass to make query as classmethod
+        """
         from pGerrit.change import GerritChange
         return GerritChange(self.host, gerritID=None, auth=self.session.auth, verify=self.verify, adapter=self.adapter)
 
     @property
     def access(self):
+        """Provides an instance of GerritAccess for the given Gerrit client configuration.
+
+        :return: An instance of GerritAccess.
+        :rtype: pGerrit.Access.GerritAccess
+
+        Usage::
+
+            gerrit_client = GerritClient(...)
+            access = gerrit_client.access.query(...)
+        """
         from pGerrit.Access import GerritAccess
         return GerritAccess(self.host, auth=self.session.auth, verify=self.verify, adapter=self.adapter)
