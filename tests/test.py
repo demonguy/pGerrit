@@ -94,7 +94,7 @@ class TestChange(unittest.TestCase):
         self.assertIsInstance(submitted_together, list)
 
     def testChange_in(self):
-        _in = self.change._in()
+        _in = self.change.in_()
         self.assertIsInstance(_in, SimpleNamespace)
 
     def testChangeComments(self):
