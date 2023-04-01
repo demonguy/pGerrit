@@ -36,8 +36,8 @@ If you want to use pGerrit on your private Gerrit host. Then you probably
 need to get a HTTP password for authentication.
 
 If your Gerrit administrator stay default configuration, then you can find your HTTP password
-by ``Settings``->``HTTPCredentials``->``GENERATE NEW PASSWORD``. And your username at
-``Settings``->``Profile``->``Username``
+by ``Settings`` -> ``HTTPCredentials`` -> ``GENERATE NEW PASSWORD``. And your username at
+``Settings`` -> ``Profile`` -> ``Username``
 
 Then you can use it like below::
 
