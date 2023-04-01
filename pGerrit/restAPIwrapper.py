@@ -4,13 +4,13 @@ from types import SimpleNamespace
 from pGerrit.utils import urljoin, urlformat
 from pGerrit.exception import GerritError
 import json
-
+from typing import Callable
 
 class GerritRest(object):
     """
     docstring for RestAPI
     """
-    def get(raw=False):
+    def get(raw=False) -> Callable:
         def dec_get(func):
             @wraps(func)
             def decorator_get(self, headers={"Accept":"application/json"}, *args, **kwargs):
@@ -30,7 +30,7 @@ class GerritRest(object):
             return decorator_get
         return dec_get
 
-    def put(func):
+    def put(func) -> Callable:
         @wraps(func)
         def decorator_put(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
@@ -41,7 +41,7 @@ class GerritRest(object):
             return res
         return decorator_put
 
-    def post(func):
+    def post(func) -> Callable:
         @wraps(func)
         def decorator_post(self, payload=None, headers={"content-type":"application/json"}, *args, **kwargs):
             url = func(self, payload, headers=headers, *args, **kwargs)
@@ -52,7 +52,7 @@ class GerritRest(object):
             return res
         return decorator_post
 
-    def delete(func):
+    def delete(func) -> Callable:
         @wraps(func)
         def decorator_delete(self, headers={"Accept":"application/json"}, *args, **kwargs):
             url = func(self, headers=headers, *args, **kwargs)
@@ -63,7 +63,7 @@ class GerritRest(object):
             return res
         return decorator_delete
 
-    def url_wrapper(end=None):
+    def url_wrapper(end=None) -> Callable:
         def wrapper(func):
             @wraps(func)
             def decorator_url(self, *args, **kwargs):
