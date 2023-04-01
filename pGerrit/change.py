@@ -1,9 +1,8 @@
 from pGerrit.restAPIwrapper import GerritRest
 from pGerrit.client import GerritClient
 from pGerrit.utils import urljoin, urlformat
-from pGerrit.queryMeta import QueryMeta
 
-class GerritChange(GerritClient, metaclass=QueryMeta):
+class GerritChange(GerritClient):
     """Class maps /changes/ endpoint of Gerrit REST API
 
     :return: An instance of GerritChange.
@@ -20,8 +19,9 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
         super().__init__(host, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.id = gerritID
 
+    @classmethod
     @GerritRest.get()
-    def query(self, *args, **kwargs):
+    def query(cls, *args, **kwargs):
         """Performs a GET request to query for changes from the Gerrit API.
 
         **API URL**: `/a/changes/ <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#list-changes>`__
@@ -43,7 +43,7 @@ class GerritChange(GerritClient, metaclass=QueryMeta):
                 }
             )
         """
-        return urljoin(self.host, urlformat(GerritChange._endpoint, ""))
+        return urljoin(cls.host, urlformat(GerritChange._endpoint, ""))
 
     @GerritRest.get()
     def info(self, *args, **kwargs):
