@@ -50,7 +50,8 @@ class GerritClient(object):
         if auth:
             self.session.auth = auth
 
-        self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter}
+        self.args = [host]
+        self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter, "cache":cache, "cache_expire":cache_expire}
 
         if not self.host.endswith("/"):
             self.host += "/"
@@ -64,31 +65,29 @@ class GerritClient(object):
 
         :param str id: the Change-id of Gerrit
 
-        :return: An instance of GerritChange.
-        :rtype: pGerrit.change.GerritChange
+        :return: An instance of GerritChangeQueryDescriptor.
+        :rtype: pGerrit.queryDescriptor.GerritChangeQueryDescriptor
 
         Usage::
 
             gerrit_client = GerritClient(...)
             changes = gerrit_client.change.query(...)
-            change = gerrit_client.change(12345)
-
-        Notice that GerritChange class use QueryMeta as metaclass to make query as classmethod
+            change = gerrit_client.change(12345).detail()
         """
-        from pGerrit.change import GerritChange
-        return GerritChange(self.host, gerritID=None, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
+        from pGerrit.queryDescriptor import GerritChangeQueryDescriptor
+        return GerritChangeQueryDescriptor(self)
 
     @property
     def access(self):
         """Provides an instance of GerritAccess for the given Gerrit client configuration.
 
-        :return: An instance of GerritAccess.
-        :rtype: pGerrit.Access.GerritAccess
+        :return: An instance of GerritAccessQueryDescriptor.
+        :rtype: pGerrit.queryDescriptor.GerritAccessQueryDescriptor
 
         Usage::
 
             gerrit_client = GerritClient(...)
             access = gerrit_client.access.query(...)
         """
-        from pGerrit.Access import GerritAccess
-        return GerritAccess(self.host, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
+        from pGerrit.queryDescriptor import GerritAccessQueryDescriptor
+        return GerritAccessQueryDescriptor(self)

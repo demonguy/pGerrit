@@ -1,9 +1,8 @@
 from pGerrit.restAPIwrapper import GerritRest
 from pGerrit.client import GerritClient
 from pGerrit.utils import urljoin, urlformat
-from pGerrit.queryMeta import QueryMeta
 
-class GerritAccess(GerritClient, metaclass=QueryMeta):
+class GerritAccess(GerritClient):
     """Class maps /access/ endpoint of Gerrit REST API
 
     :return: An instance of GerritAccess.
@@ -18,8 +17,9 @@ class GerritAccess(GerritClient, metaclass=QueryMeta):
         """See class docstring."""
         super().__init__(host, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
 
+    @classmethod
     @GerritRest.get()
-    def query(self, *args, **kwargs):
+    def query(cls, *args, **kwargs):
         """Performs a GET request to query for access rights from the Gerrit API.
 
         **API URL**: `/a/access/ <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#list-access>`__
@@ -33,4 +33,4 @@ class GerritAccess(GerritClient, metaclass=QueryMeta):
             access_rights = gerrit_access.query(**{"project": "All-Projects"})
 
         """
-        return urljoin(self.host, urlformat(GerritAccess._endpoint, ""))
+        return urljoin(cls.host, urlformat(GerritAccess._endpoint, ""))
