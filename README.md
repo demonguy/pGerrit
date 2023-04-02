@@ -15,7 +15,7 @@ Complete project documentation can be found at [here](https://pgerrit.readthedoc
 ## Features
 * 🍰 **Clear design:** Every REST API endpoint is a class. Every entity of the endpoint is an object
 * 🚀 **Easy of use** You can access the state of entity by access the property of the object
-* ⚙️ **Easy to contribute** Add a new REST API is pretty easy by using decorator.
+* ⚙️ **** Adapted for PyCharm's auto-completion. Next step we will support response autocomplete
 
 ## Quickstart
 
