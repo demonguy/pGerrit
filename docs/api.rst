@@ -28,6 +28,18 @@ pGerrit.change.GerritChangeRevision
     :members:
     :member-order: bysource
 
+pGerrit.change.GerritChangeEdit
+-------------------------------
+.. autoclass:: pGerrit.change.GerritChangeEdit
+    :members:
+    :member-order: bysource
+
+pGerrit.change.GerritChangeReviewer
+-----------------------------------
+.. autoclass:: pGerrit.change.GerritChangeReviewer
+    :members:
+    :member-order: bysource
+
 pGerrit.change.GerritChangeRevisionReviewer
 -------------------------------------------
 

@@ -4,7 +4,8 @@ import requests
 
 import unittest
 from pGerrit.client import GerritClient
-from pGerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile
+from pGerrit.change import GerritChange, GerritChangeRevision, GerritChangeRevisionFile, GerritChangeEdit, GerritChangeReviewer
+from pGerrit.queryDescriptor import GerritChangeEditQueryDescriptor, GerritChangeReviewerQueryDescriptor
 from pGerrit.utils import urljoin
 from requests.auth import HTTPBasicAuth
 from pGerrit.utils import urljoin
@@ -40,6 +41,8 @@ assert g_host is not None
 g_id = os.environ.get("GERRIT_CHANGE_NUMBER")
 assert g_id is not None
 
+g_file_id = "COMMIT_MSG"
+
 
 class TestChange(unittest.TestCase):
     """docstring for TestGerrit"""
@@ -52,32 +55,21 @@ class TestChange(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testChangeDetail(self):
-        detail = self.change.detail(o=["ALL_COMMITS", "CURRENT_REVISION"])
-        self.assertIsInstance(detail, SimpleNamespace)
-        self.assertEqual(detail.branch, "master")
+    def testChangeQuery(self):
+        results = self.client.change.query(q=g_id)
+        self.assertIsInstance(results, list)
+        for result in results:
+            self.assertIsInstance(result, SimpleNamespace)
 
     def testChangeInfo(self):
         info = self.change.info(o=["ALL_COMMITS", "CURRENT_REVISION"])
         self.assertIsInstance(info, SimpleNamespace)
         self.assertEqual(info.branch, "master")
 
-    def testChangeIsMerge(self):
-        self.assertTrue(self.change.is_merge())
-
-    def testChangeCurrentRevision(self):
-        revision = self.change.current_revision()
-        self.assertIsInstance(revision, GerritChangeRevision)
-
-    def testChangeRevision(self):
-        revision = self.change.revision("current")
-        self.assertIsInstance(revision, GerritChangeRevision)
-
-    def testChangeQuery(self):
-        results = self.client.change.query(q=g_id)
-        self.assertIsInstance(results, list)
-        for result in results:
-            self.assertIsInstance(result, SimpleNamespace)
+    def testChangeDetail(self):
+        detail = self.change.detail(o=["ALL_COMMITS", "CURRENT_REVISION"])
+        self.assertIsInstance(detail, SimpleNamespace)
+        self.assertEqual(detail.branch, "master")
 
     def testChangeTopic(self):
         topic = self.change.topic()
@@ -88,6 +80,11 @@ class TestChange(unittest.TestCase):
         self.change.set_topic(target_topic)
         topic = self.change.topic()
         self.assertEqual(topic, target_topic)
+
+    def testDeleteChangeTopic(self):
+        self.change.delete_topic()
+        topic = self.change.topic()
+        self.assertEqual(topic, "")
 
     def testChangeSubmitted_together(self):
         submitted_together = self.change.submitted_together()
@@ -101,6 +98,18 @@ class TestChange(unittest.TestCase):
         comments = self.change.comments()
         self.assertIsInstance(comments, SimpleNamespace)
 
+    def testChangeRobotComments(self):
+        robot_comments = self.change.robotcomments()
+        if len(vars(robot_comments)) == 0:
+            return
+
+        self.assertIsInstance(robot_comments, dict)
+        for key, value in robot_comments.items():
+            self.assertIsInstance(key, str)
+            self.assertIsInstance(value, list)
+            for comment in value:
+                self.assertIsInstance(comment, SimpleNamespace)
+
     def testChangeDrafts(self):
         drafts = self.change.drafts()
         self.assertIsInstance(drafts, SimpleNamespace)
@@ -109,38 +118,45 @@ class TestChange(unittest.TestCase):
         check = self.change.check()
         self.assertIsInstance(check, SimpleNamespace)
 
+    def testChangeHashtags(self):
+        hashtags = self.change.hashtags()
+        if isinstance(hashtags, SimpleNamespace) and len(vars(hashtags)) == 0:
+            return
+
+        self.assertIsInstance(hashtags, list)
+        for hashtag in hashtags:
+            self.assertIsInstance(hashtag, str)
+
+    def testSetChangeHashtag(self):
+        target_hashtags = ["test1", "test2"]
+        self.change.set_hashtags(payload={"add":target_hashtags})
+        hashtags = self.change.hashtags()
+        self.change.set_hashtags(payload={"remove":target_hashtags})
+        self.assertEqual(set(hashtags), set(target_hashtags))
+
     @unittest.skip("This change cannot be rebased, so skip")
     def testChangeRebase(self):
         rebase = self.change.rebase()
         # self.assertIsInstance(edit, SimpleNamespace)
 
-    @unittest.skip("Edit will return empty unless the change is in the edit status")
+    def testChangeIsMerge(self):
+        self.assertTrue(self.change.is_merge())
+
+    def testChangeCurrentRevision(self):
+        revision = self.change.current_revision()
+        self.assertIsInstance(revision, GerritChangeRevision)
+
+    def testChangeRevision(self):
+        revision = self.change.revision("current")
+        self.assertIsInstance(revision, GerritChangeRevision)
+
     def testChangeEdit(self):
-        edit = self.change.edit()
-        self.assertIsInstance(edit, SimpleNamespace)
+        edit = self.change.edit
+        self.assertIsInstance(edit, GerritChangeEditQueryDescriptor)
 
-    @unittest.skip("Edit will return empty unless the change is in the edit status")
-    def testChangeEditPublish(self):
-        edit = self.change.edit_publish()
-        self.assertIsInstance(edit, SimpleNamespace)
-
-    @unittest.skip("Edit will return empty unless the change is in the edit status")
-    def testChangeEditDelete(self):
-        edit = self.change.edit_delete()
-        self.assertIsInstance(edit, SimpleNamespace)
-
-    def testChangeReviewers(self):
-        reviewers = self.change.reviewers()
-        self.assertIsInstance(reviewers[0], SimpleNamespace)
-
-    def testChangeAddReviewers(self):
-        payload = {"reviewer":g_username}
-        res = self.change.add_reviewer(payload=payload)
-        self.assertEqual(res.status_code, 200)
-
-    def testChangeSuggest_reviewers(self):
-        suggest_reviewers = self.change.suggest_reviewers()
-        self.assertIsInstance(suggest_reviewers[0], SimpleNamespace)
+    def testChangeReviewer(self):
+        reviewer = self.change.reviewer
+        self.assertIsInstance(reviewer, GerritChangeReviewerQueryDescriptor)
 
 class TestChangeRevisionReviewer(unittest.TestCase):
     """docstring for Test"""
@@ -151,19 +167,83 @@ class TestChangeRevisionReviewer(unittest.TestCase):
         self.change = self.client.change(g_id)
         self.revision = self.change.revision("1")
         self.current = self.change.current_revision()
-        self.reviewer = self.current.reviwer("")
+        self.reviewer = self.current.reviewer("")
 
     def tearDown(self):
         pass
 
-    def testRevisionReviwerList(self):
+    def testRevisionReviewerList(self):
         files = self.reviewer.list()
         self.assertIsInstance(files, list)
 
     @unittest.skip("Delete vote can only delete others vote, so cannot be idempotent")
-    def testRevisionReviwerDeleteVote(self):
+    def testRevisionReviewerDeleteVote(self):
         files = self.reviewer.delete_vote()
         self.assertIsInstance(files, SimpleNamespace)
+
+class TestGerritChangeReviewer(unittest.TestCase):
+
+    def setUp(self):
+        requests.packages.urllib3.disable_warnings()
+        self.auth = HTTPBasicAuth(g_username, g_password)
+        self.client = GerritClient(g_host, auth=self.auth, verify=False)
+        self.change = self.client.change(g_id)
+        self.revision = self.change.revision("1")
+        self.current = self.change.current_revision()
+        self.reviewer = self.change.reviewer
+
+    def test_query(self):
+        reviewers = self.reviewer.query()
+        if isinstance(reviewers, SimpleNamespace) and len(vars(reviewers)) == 0:
+            return
+
+        self.assertIsInstance(reviewers, list)
+        for reviewer in reviewers:
+            self.assertIsInstance(reviewer, SimpleNamespace)
+
+    def test_suggest_reviewers(self):
+        suggested_reviewers = self.reviewer.suggest_reviewers(q="john")
+        self.assertIsInstance(suggested_reviewers, list)
+
+    @unittest.skip
+    def test_add_reviewer(self):
+        response = self.gerrit_reviewer.add_reviewer({"reviewer": "example@example.com"})
+        self.assertIsNotNone(response)
+
+class TestGerritChangeEdit(unittest.TestCase):
+
+    def setUp(self):
+        requests.packages.urllib3.disable_warnings()
+        self.auth = HTTPBasicAuth(g_username, g_password)
+        self.client = GerritClient(g_host, auth=self.auth, verify=False)
+        self.change = self.client.change(g_id)
+        self.edit = self.change.edit(g_file_id)
+
+    def test_info(self):
+        info = self.change.edit.info()
+        self.assertIsNotNone(info)
+
+    @unittest.skip
+    def test_edit_publish(self):
+        # Create an edit before trying to publish
+        self.edit.edit_file(payload='new_file_content')
+        self.edit.edit_publish()
+
+    @unittest.skip
+    def test_edit_restore(self):
+        # Create an edit before trying to restore
+        self.edit.edit_file(payload='new_file_content')
+        self.edit.edit_restore({"restore_path": "foo"})
+
+    @unittest.skip
+    def test_edit_delete(self):
+        # Create an edit before trying to delete
+        self.edit.edit_file(payload='new_file_content')
+        self.edit.edit_delete()
+
+    @unittest.skip
+    def test_edit_file(self):
+        self.edit.edit_file(payload='new_file_content')
 
 class TestChangeRevision(unittest.TestCase):
     """docstring for Test"""
@@ -285,3 +365,5 @@ class TestAccess(unittest.TestCase):
         access = self.client.access.query(project="All-Projects")
         self.assertIsInstance(access, SimpleNamespace)
 
+if __name__ == "__main__":
+    unittest.main()
