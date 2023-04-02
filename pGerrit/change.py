@@ -14,10 +14,13 @@ class GerritChange(GerritClient):
     _endpoint = "/a/changes/{}"
     _args = ["id"]
 
-    def __init__(self, host, gerritID=None, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+    def __init__(self, host, gerritID, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
         super().__init__(host, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.id = gerritID
+
+        self.args = [host, gerritID]
+        self.kwargs = {"auth": auth, "verify": verify, "adapter":adapter, "cache":cache, "cache_expire":cache_expire}
 
     @classmethod
     @GerritRest.get()
@@ -61,20 +64,6 @@ class GerritChange(GerritClient):
 
         """
         return urljoin(self.host, urlformat(GerritChange._endpoint, self.id))
-
-    def is_merge(self):
-        """Checks if the change is a merge change.
-
-        Usage::
-
-            is_merge_change = change.is_merge()
-
-        """
-        revision = self.current_revision()
-        if len(revision.commit().parents) == 2:
-            return True
-        else:
-            return False
 
     @GerritRest.get()
     @GerritRest.url_wrapper()
@@ -126,6 +115,24 @@ class GerritChange(GerritClient):
         Usage::
 
             change.set_topic({"topic": "new-topic"})
+
+        """
+        pass
+
+    @GerritRest.delete
+    @GerritRest.url_wrapper("topic")
+    def delete_topic(self, *args, **kwargs):
+        """Performs a PUT request to set the topic of a change.
+
+        **API URL**: `/a/changes/{change_id}/topic <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#set-topic>`__
+
+        **Input type**: None
+
+        **Return type**: None
+
+        Usage::
+
+            change.delete_topic()
 
         """
         pass
@@ -240,60 +247,6 @@ class GerritChange(GerritClient):
 
     @GerritRest.get()
     @GerritRest.url_wrapper()
-    def edit(self, *args, **kwargs):
-        """Performs a GET request to retrieve information about the change edit.
-
-        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#edit-endpoints>`__
-
-        **Input type**: None
-
-        **Return type**: `EditInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#edit-info>`__
-
-        Usage::
-
-            change.edit()
-
-        """
-        pass
-
-    @GerritRest.get()
-    @GerritRest.url_wrapper()
-    def reviewers(self, *args, **kwargs):
-        """Performs a GET request to retrieve the list of reviewers for a change.
-
-        **API URL**: `/a/changes/{change_id}/reviewers <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#list-reviewers>`__
-
-        **Input type**: None
-
-        **Return type**: List[`ReviewerInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#reviewer-info>`__]
-
-        Usage::
-
-            change.reviewers()
-
-        """
-        pass
-
-    @GerritRest.post
-    @GerritRest.url_wrapper("reviewers")
-    def add_reviewer(self, *args, **kwargs):
-        """Performs a POST request to add a reviewer to a change.
-
-        **API URL**: `/a/changes/{change_id}/reviewers <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#add-reviewer>`__
-
-        **Input type**: `ReviewerInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#reviewer-input>`__
-
-        **Return type**: `ReviewerResult <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#reviewer-result>`__
-
-        Usage::
-
-            change.add_reviewer({"reviewer": "example@example.com"})
-
-        """
-        pass
-
-    @GerritRest.get()
-    @GerritRest.url_wrapper()
     def hashtags(self, *args, **kwargs):
         """Performs a GET request to retrieve the hashtags associated with a change.
 
@@ -312,7 +265,7 @@ class GerritChange(GerritClient):
 
     @GerritRest.post
     @GerritRest.url_wrapper("hashtags")
-    def set_hashtags(self, *args, **kwargs):
+    def set_hashtags(self, payload=None, *args, **kwargs):
         """Performs a POST request to add or remove hashtags from a change.
 
         **API URL**: `/a/changes/{change_id}/hashtags <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#set-hashtags>`__
@@ -323,25 +276,7 @@ class GerritChange(GerritClient):
 
         Usage::
 
-            change.set_hashtags(add=["tag1"], remove=["tag2"])
-
-        """
-        pass
-
-    @GerritRest.get()
-    @GerritRest.url_wrapper()
-    def suggest_reviewers(self, *args, **kwargs):
-        """Performs a GET request to retrieve a list of suggested reviewers for a change.
-
-        **API URL**: `/a/changes/{change_id}/suggest_reviewers <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggest-reviewers>`__
-
-        **Input type**: `SuggestReviewersOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggest-reviewers>`__
-
-        **Return type**: List[`SuggestedReviewerInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggested-reviewer-info>`__]
-
-        Usage::
-
-            change.suggest_reviewers(q="john")
+            change.set_hashtags(payload={"add":["tag1"], "remove":["tag2"]})
 
         """
         pass
@@ -364,60 +299,6 @@ class GerritChange(GerritClient):
         """
         pass
 
-    @GerritRest.post
-    @GerritRest.url_wrapper("edit:publish")
-    def edit_publish(self, payload=None, headers=None):
-        """Performs a POST request to publish a change edit.
-
-        **API URL**: `/a/changes/{change_id}/edit:publish <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#publish-edit>`__
-
-        **Input type**: `PublishChangeEditInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#publish-change-edit-input>`__ (optional)
-
-        **Return type**: None
-
-        Usage::
-
-            change.edit_publish()
-
-        """
-        pass
-
-    @GerritRest.post
-    @GerritRest.url_wrapper("edit")
-    def edit_restore(self, payload=None, headers=None):
-        """Performs a POST request to restore a change edit.
-
-        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#post-edit>`__
-
-        **Input type**: `ChangeEditInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-edit-input>`__
-        
-        **Return type**: None
-
-        Usage::
-
-            change.edit_restore({"restore_path": "foo"})
-
-        """
-        pass
-
-    @GerritRest.delete
-    @GerritRest.url_wrapper("edit")
-    def edit_delete(self, payload=None, headers=None):
-        """Performs a DELETE request to delete a change edit.
-
-        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#delete-edit>`__
-
-        **Input type**: None
-
-        **Return type**: None
-
-        Usage::
-
-            change.edit_delete()
-
-        """
-        pass
-
     @GerritRest.delete
     @GerritRest.url_wrapper("")
     def delete_change(self, payload=None, headers=None):
@@ -435,6 +316,21 @@ class GerritChange(GerritClient):
 
         """
         pass
+
+    def is_merge(self):
+        """Checks if the change is a merge change.
+
+        Usage::
+
+            is_merge_change = change.is_merge()
+
+        """
+        revision = self.current_revision()
+        if len(revision.commit().parents) == 2:
+            return True
+        else:
+            return False
+
 
     def revision(self, revisionID):
         """Creates a GerritChangeRevision object for a specific revision of the change.
@@ -457,6 +353,234 @@ class GerritChange(GerritClient):
 
         """
         return GerritChangeRevision(self.host, self.id, "current", auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
+
+    @property
+    def edit(self):
+        """Provides an instance of GerritChangeEditQueryDescriptor for the given Gerrit client configuration.
+
+        :return: An instance of GerritChangeEditQueryDescriptor.
+        :rtype: pGerrit.queryDescriptor.GerritChangeEditQueryDescriptor
+
+        Usage::
+
+            change = GerritChange(...)
+            edit_info = change.edit.info()
+            edited_content = change.edit("COMMIT_MSG").edit_retrieve()
+
+        """
+        from pGerrit.queryDescriptor import GerritChangeEditQueryDescriptor
+        return GerritChangeEditQueryDescriptor(self)
+
+    @property
+    def reviewer(self):
+        """Provides an instance of GerritChangeReviewerQueryDescriptor for the given Gerrit client configuration.
+
+        :return: An instance of GerritChangeReviewerQueryDescriptor.
+        :rtype: pGerrit.queryDescriptor.GerritChangeReviewerQueryDescriptor
+
+        Usage::
+
+            change = GerritChange(...)
+            reviewers = change.reviewer.query()
+            suggested_reviewers = change.reviewer.suggest_reviewers(q="john")
+            result = change.reviewer.add_reviewer({"reviewer": "example@example.com"})
+
+        """
+        from pGerrit.queryDescriptor import GerritChangeReviewerQueryDescriptor
+        return GerritChangeReviewerQueryDescriptor(self)
+
+class GerritChangeEdit(GerritChange):
+    """Class maps /a/changes/{change_id}/edit endpoint of Gerrit REST API
+
+    :return: An instance of GerritChangeEdit.
+    :rtype: pGerrit.change.GerritChangeEdit
+
+    You won't need to instantiate this Class directly.
+    Use ``pGerrit.change.GerritChange.revision``
+    """
+    _endpoint = "/a/changes/{}/edit/{}"
+    _args = ["id", "fileID"]
+
+    def __init__(self, host, gerritID, fileID, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+        """See class docstring."""
+        super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
+        self.fileID = fileID
+
+    @classmethod
+    @GerritRest.get()
+    def info(self, *args, **kwargs):
+        """Performs a GET request to retrieve information about the change edit.
+
+        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#edit-endpoints>`__
+
+        **Input type**: None
+
+        **Return type**: `EditInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#edit-info>`__
+
+        Usage::
+
+            edit.info()
+
+        """
+        return urljoin(self.host, urlformat(GerritChangeEdit._endpoint, self.id, ""))
+
+    @classmethod
+    @GerritRest.post
+    @GerritRest.url_wrapper("edit:publish")
+    def edit_publish(self, payload=None, headers=None):
+        """Performs a POST request to publish a change edit.
+
+        **API URL**: `/a/changes/{change_id}/edit/edit:publish <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#publish-edit>`__
+
+        **Input type**: `PublishChangeEditInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#publish-change-edit-input>`__ (optional)
+
+        **Return type**: None
+
+        Usage::
+
+            edit.edit_publish()
+
+        """
+        pass
+
+    @classmethod
+    @GerritRest.post
+    @GerritRest.url_wrapper("edit")
+    def edit_restore(self, payload=None, headers=None):
+        """Performs a POST request to restore a change edit.
+
+        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#post-edit>`__
+
+        **Input type**: `ChangeEditInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-edit-input>`__
+        
+        **Return type**: None
+
+        Usage::
+
+            edit.edit_restore({"restore_path": "foo"})
+
+        """
+        pass
+
+    @classmethod
+    @GerritRest.delete
+    @GerritRest.url_wrapper("edit")
+    def edit_delete(self, headers=None):
+        """Performs a DELETE request to delete a change edit.
+
+        **API URL**: `/a/changes/{change_id}/edit <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#delete-edit>`__
+
+        **Input type**: None
+
+        **Return type**: None
+
+        Usage::
+
+            edit.edit_delete()
+
+        """
+        pass
+
+    @GerritRest.put
+    @GerritRest.url_wrapper()
+    def edit_file(self, payload, headers=None):
+        """Performs a PUT request to edit a specific file in a change revision.
+
+        **API URL**: `/a/changes/{change_id}/edit/{file_id} <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#edit-file>`__
+
+        **Input type**: str
+
+        **Return type**: None
+
+        Usage::
+
+            edit_file.edit(payload='new_file_content')
+
+        """
+        pass
+
+    @GerritRest.get()
+    @GerritRest.url_wrapper()
+    def edit_retrieve(self, headers=None):
+        """Performs a GET request to retrieve the content of a specific file in a change revision after editing.
+
+        **API URL**: `/a/changes/{change_id}/edit/{file_id} <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#get-edit>`__
+
+        **Input type**: None
+
+        **Return type**: str
+
+        Usage::
+
+            edited_content = edit_file.edit_retrieve()
+
+        """
+        pass
+
+class GerritChangeReviewer(GerritChange):
+    """Class maps /a/changes/{change_id}/reviewers/{account_id} endpoint of Gerrit REST API
+
+    :return: An instance of GerritChangeReviewer.
+    :rtype: pGerrit.change.GerritChangeReviewer
+
+    You won't need to instantiate this Class directly.
+    Use ``pGerrit.change.GerritChange.reviewer``
+    """
+    _endpoint = "/a/changes/{}/reviewers/{}"
+    _args = ["id", "account_id"]
+
+    def __init__(self, host, account_id, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+        """See class docstring."""
+        super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
+        self.account_id = account_id
+
+    @classmethod
+    @GerritRest.get()
+    def query(self, *args, **kwargs):
+        """Performs a GET request to retrieve information about the change edit.
+
+        **API URL**: `/a/changes/{change_id}/reviewers/ <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#list-reviewers>`__
+
+        **Input type**: None
+        """
+        return urljoin(self.host, urlformat(GerritChangeReviewer._endpoint, self.id, ""))
+
+    @classmethod
+    @GerritRest.get()
+    def suggest_reviewers(self, *args, **kwargs):
+        """Performs a GET request to retrieve a list of suggested reviewers for a change.
+
+        **API URL**: `/a/changes/{change_id}/suggest_reviewers <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggest-reviewers>`__
+
+        **Input type**: `SuggestReviewersOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggest-reviewers>`__
+
+        **Return type**: List[`SuggestedReviewerInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#suggested-reviewer-info>`__]
+
+        Usage::
+
+            reviewer.suggest_reviewers(q="john")
+
+        """
+        return urljoin(self.host, urlformat("/a/changes/{}/suggest_reviewers", self.id, "suggest_reviewers"))
+
+    @classmethod
+    @GerritRest.post
+    def add_reviewer(self, payload=None, *args, **kwargs):
+        """Performs a POST request to add a reviewer to a change.
+
+        **API URL**: `/a/changes/{change_id}/reviewers <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#add-reviewer>`__
+
+        **Input type**: `ReviewerInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#reviewer-input>`__
+
+        **Return type**: `ReviewerResult <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#reviewer-result>`__
+
+        Usage::
+
+            reviewer.add_reviewer({"reviewer": "example@example.com"})
+
+        """
+        return urljoin(self.host, urlformat(self._endpoint, self.id, ""))
+
 
 class GerritChangeRevision(GerritChange):
     """Class maps /a/changes/{change_id}/revisions/{revision_id} endpoint of Gerrit REST API
@@ -706,7 +830,7 @@ class GerritChangeRevision(GerritChange):
         """
         return GerritChangeRevisionFile(self.host, self.id, self.revisionID, fileID, auth=self.session.auth, verify=self.verify, adapter=self.adapter, cache=self.cache, cache_expire=self.cache_expire)
 
-    def reviwer(self, accountID):
+    def reviewer(self, accountID):
         """Get the GerritChangeRevisionReviewer instance for a specific reviewer of the change revision.
 
         :arg str accountID: The ID of the reviewer.
@@ -892,40 +1016,3 @@ class GerritChangeRevisionFile(GerritChangeRevision):
         project = self.info().project
         commit = commit or self.commit().commit
         return urljoin(self.host, "a/plugins", "gitiles", project, "+log", commit, self.fileID)
-
-    @GerritRest.put
-    def edit(self, payload, headers=None):
-        """Edit a specific file in a change revision.
-
-        :param payload: The file content to be updated.
-        :type payload: str
-        :param headers: (optional) Additional headers to send with the request.
-        :type headers: dict
-
-        :return: The URL for the edited file.
-        :rtype: str
-
-        Usage::
-
-            edit_url = revision_file.edit(payload='new_file_content')
-
-        """
-        return urljoin(self.host, "/a/changes/", self.id, "/edit/", urlformat("{}", self.fileID))
-
-    @GerritRest.get()
-    def edit_retrieve(self, headers=None):
-        """Retrieve the content of a specific file in a change revision after editing.
-
-        :param headers: (optional) Additional headers to send with the request.
-        :type headers: dict
-
-        :return: The content of the specified file in the change revision after editing.
-        :rtype: str
-
-        Usage::
-
-            edited_content = revision_file.edit_retrieve()
-
-        """
-        return urljoin(self.host, "/a/changes/", self.id, "/edit/", urlformat("{}", self.fileID))
-

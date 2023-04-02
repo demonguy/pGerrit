@@ -39,28 +39,3 @@ But if you need to retreive result exactly from Server rather than
 cache, you can disable it in GerritClient object::
 
     client = GerritClient("https://xxxx.gerrit.com/", cache=False)
-
-Handling exceptions
--------------------
-
-You can use ``try catch`` to handle exceptions::
-
-    from Gerrit.exception import  GerritError
-    from Gerrit.client import GerritClient
-    from requests.auth import HTTPBasicAuth
-
-    auth = HTTPBasicAuth("xxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxx")
-    client = GerritClient("http://xxxxxxxxx.gerrit.com/", auth=auth)
-
-    try:
-      change = client.change("111111111111111111111") #obviously this is a non-exist change
-      detail = change.detail()
-    except GerritError as e:
-      print(e.status, e.content)
-    else:
-      pass
-    finally:
-      pass
-
-Result
-    ``404 b'Not found: 111111111111111111111\n'``
