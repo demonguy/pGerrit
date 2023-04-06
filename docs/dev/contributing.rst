@@ -25,18 +25,25 @@ is pretty easy and elegant::
 
 Calling this method will invoke request to `http://{your_host_name}/a/changes/{change_id}/detail <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#get-change-detail>`__
 
-The @GerritRest.url_wrapper decorator is used to assemble the URL.
-In the REST API detail interface, you should send a GET request to access
+The ``@GerritRest.get decorator`` is responsible for submitting HTTP
+requests and accessing the data. It retrieves the URL from the decorated
+function and sends a GET request to the URL directly.
+The returned JSON data is then wrapped as a SimpleNamespace instance.
+
+The ``@GerritRest.url_wrapper`` decorator is used to assemble the URL.
+In the REST API ``change.detail`` interface, you should send a GET request to access
 the URL ``http://{your_host_name}/a/changes/{change_id}/detail``.This decorator
 assembles the URL, and the last line
 ``urljoin(self.host, urlformat(cls_d._endpoint, *args), name)`` is equivalent
 to urljoin("{your_host_name}", "/a/changes/{your_change_id}", "detail").
 You can now understand what cls_d._endpoint and name actually represent.
+By default, it takes the decorated function name as the final part of
+the url. It can also take an argument to override it. Refer to
+``GerritChange.set_topic`` as an example
 
-The @GerritRest.get decorator is the function responsible for submitting HTTP
-requests and accessing the data. It retrieves the URL from the decorated
-function and sends a GET request to the URL directly.
-The returned JSON data is then wrapped as a SimpleNamespace instance.
+This rule sometimes doesn't apply to specific REST API. So we can only use
+``urljoin`` to assemble the url manually. Refer to ``@GerritRest.query``
+as an example
 
 Transforming Json into SimpleNamespace allows you to avoid the
 square brackets hell . (e.g. ``detail.branch`` rather than ``detail["branch"]``)
