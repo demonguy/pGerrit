@@ -1,5 +1,4 @@
 from functools import wraps
-import requests
 from types import SimpleNamespace
 from pGerrit.utils import urljoin, urlformat
 import json

@@ -529,7 +529,7 @@ class GerritChangeReviewer(GerritChange):
     _endpoint = "/a/changes/{}/reviewers/{}"
     _args = ["id", "account_id"]
 
-    def __init__(self, host, account_id, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
+    def __init__(self, host, gerritID, account_id, auth=None, verify=True, adapter=None, cache=True, cache_expire=3):
         """See class docstring."""
         super().__init__(host, gerritID, auth=auth, verify=verify, adapter=adapter, cache=cache, cache_expire=cache_expire)
         self.account_id = account_id
