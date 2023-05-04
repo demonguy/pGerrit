@@ -91,3 +91,19 @@ class GerritClient(object):
         """
         from pGerrit.queryDescriptor import GerritAccessQueryDescriptor
         return GerritAccessQueryDescriptor(self)
+
+    @property
+    def project(self):
+        """Provides an instance of GerritProject for the given Gerrit client configuration.
+
+        :return: An instance of GerritProjectQueryDescriptor.
+        :rtype: pGerrit.queryDescriptor.GerritProjectQueryDescriptor
+
+        Usage::
+
+            gerrit_client = GerritClient(...)
+            projects = gerrit_client.project.query(...)
+            project = gerrit_client.project("test")
+        """
+        from pGerrit.queryDescriptor import GerritProjectQueryDescriptor
+        return GerritProjectQueryDescriptor(self)

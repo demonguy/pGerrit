@@ -43,6 +43,9 @@ assert g_id is not None
 
 g_file_id = "COMMIT_MSG"
 
+g_pj = os.environ.get("GERRIT_PROJECT_NAME")
+assert g_pj is not None
+
 
 class TestChange(unittest.TestCase):
     """docstring for TestGerrit"""
@@ -363,6 +366,27 @@ class TestAccess(unittest.TestCase):
 
     def testAccessQuery(self):
         access = self.client.access.query(project="All-Projects")
+        self.assertIsInstance(access, SimpleNamespace)
+
+class TestProject(unittest.TestCase):
+    """docstring for TestGerrit"""
+    def setUp(self):
+        requests.packages.urllib3.disable_warnings()
+        self.auth = HTTPBasicAuth(g_username, g_password)
+        self.client = GerritClient(g_host, auth=self.auth, verify=False)
+        self.project = self.client.project(g_pj)
+
+    def tearDown(self):
+        pass
+
+    def testProjectQuery(self):
+        results = self.client.project.query(query=g_pj)
+        self.assertIsInstance(results, list)
+        for result in results:
+            self.assertIsInstance(result, SimpleNamespace)
+
+    def testProjectAccess(self):
+        access = self.project.access()
         self.assertIsInstance(access, SimpleNamespace)
 
 if __name__ == "__main__":
