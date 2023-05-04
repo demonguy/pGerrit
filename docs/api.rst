@@ -60,3 +60,10 @@ pGerrit.Access.GerritAccess
 .. autoclass:: pGerrit.Access.GerritAccess
     :members:
     :member-order: bysource
+
+pGerrit.project.GerritProject
+---------------------------
+
+.. autoclass:: pGerrit.project.GerritProject
+    :members:
+    :member-order: bysource

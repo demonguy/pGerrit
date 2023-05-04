@@ -2,6 +2,7 @@
 # In oder to make IDE autocomple work , we need to return exact type from __call__ method
 from pGerrit.change import GerritChange, GerritChangeEdit, GerritChangeReviewer
 from pGerrit.Access import GerritAccess
+from pGerrit.project import GerritProject
 
 class QueryDescriptor(object):
     def __init__(self, factory_obj):
@@ -83,3 +84,17 @@ class GerritAccessQueryDescriptor(QueryDescriptor):
         :rtype: pGerrit.Access.GerritAccess
         '''
         return GerritAccess(*self.factory_obj.args, *args, **self.factory_obj.kwargs, **kwargs)
+    
+class GerritProjectQueryDescriptor(QueryDescriptor):
+    def __init__(self, factory_obj):
+        super().__init__(factory_obj)
+
+    def query(self, *args, **kwargs):
+        return GerritProject.query.__func__(self.factory_obj, *args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        '''
+        :return: An instance of GerritProject.
+        :rtype: pGerrit.project.GerritProject
+        '''
+        return GerritProject(*self.factory_obj.args, *args, **self.factory_obj.kwargs, **kwargs)
