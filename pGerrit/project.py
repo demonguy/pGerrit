@@ -27,11 +27,11 @@ class GerritProject(GerritClient):
     def query(cls, *args, **kwargs):
         """Performs a GET request to query for projects from the Gerrit API.
 
-        **API URL**: `/a/projects/ <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#list-projects>`
+        **API URL**: `/a/projects/ <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#list-projects>`__
 
-        **Input type**: `QueryOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#list-projects>`
+        **Input type**: `QueryOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#list-projects>`__
 
-        **Return type**: `ProjectInfo  <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#project-info>`
+        **Return type**: `ProjectInfo  <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#project-info>`__
 
         Usage::
 
@@ -46,11 +46,11 @@ class GerritProject(GerritClient):
     def access(self, *args, **kwargs):
         """Performs a GET request to list access rights for project from the Gerrit API.
 
-        **API URL**: `/a/projects/ <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#get-access>`
+        **API URL**: `/a/projects/ <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#get-access>`__
 
-        **Input type**: `QueryOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#get-access>`
+        **Input type**: `QueryOptions <https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#get-access>`__
 
-        **Return type**: `ProjectAccessInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#project-access-info>`
+        **Return type**: `ProjectAccessInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-access.html#project-access-info>`__
 
         Usage::
             project.access()
