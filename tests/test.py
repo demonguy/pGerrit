@@ -142,6 +142,15 @@ class TestChange(unittest.TestCase):
         rebase = self.change.rebase()
         # self.assertIsInstance(edit, SimpleNamespace)
 
+    def testChangeCreateMerge(self):
+        createMerge = self.change.merge(payload={
+            "merge": {
+                "source": self.change.revision("1").commit().commit,
+                "allow_conflicts": "True"
+            }
+        })
+        self.assertEqual(createMerge.status_code, 200)
+
     def testChangeIsMerge(self):
         self.assertTrue(self.change.is_merge())
 
