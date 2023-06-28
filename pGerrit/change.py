@@ -299,6 +299,24 @@ class GerritChange(GerritClient):
         """
         pass
 
+    @GerritRest.post
+    @GerritRest.url_wrapper()
+    def merge(self, payload=None, headers=None):
+        """Performs a POST request to create merge patch set for change.
+
+        **API URL**: `/a/changes/{change_id}/merge <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#create-merge-patch-set-for-change>`__
+
+        **Input type**: `MergePatchSetInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#merge-patch-set-input>`__
+
+        **Return type**: `ChangeInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info>`__
+
+        Usage::
+
+            change.merge()
+
+        """
+        pass
+
     @GerritRest.delete
     @GerritRest.url_wrapper("")
     def delete_change(self, payload=None, headers=None):
