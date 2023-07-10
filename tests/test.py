@@ -64,6 +64,22 @@ class TestChange(unittest.TestCase):
         for result in results:
             self.assertIsInstance(result, SimpleNamespace)
 
+    def testChangeCreate(self):
+        createChange = self.client.change.create(payload={
+            "project": "test-for-hook",
+            "branch": "master-9",
+            "subject": "test",
+            "topic": "test",
+            "validation_options": {
+                "code-owners~skip-validation": True
+            },
+            "merge": {
+                "source": "7a8b0dabaa5fbf38ebf61fac5def37e08e60bce3",
+                "allow_conflicts": True
+            }
+        })
+        self.assertEqual(createChange.status_code, 201)
+
     def testChangeInfo(self):
         info = self.change.info(o=["ALL_COMMITS", "CURRENT_REVISION"])
         self.assertIsInstance(info, SimpleNamespace)

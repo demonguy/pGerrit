@@ -48,6 +48,29 @@ class GerritChange(GerritClient):
         """
         return urljoin(cls.host, urlformat(GerritChange._endpoint, ""))
 
+    @classmethod
+    @GerritRest.post
+    def create(cls, payload=None, *args, **kwargs):
+        """Performs a POST request to create for changes from the Gerrit API.
+
+        **API URL**: `/a/changes/ <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#create-change>`__
+
+        **Input type**: `ChangeInput <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#create-change>`__
+
+        **Return type**: List[`ChangeInfo <https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info>`__]
+
+        Usage::
+
+            change.create(payload=
+                {
+                    "project": "xxx",
+                    "branch": "xxx",
+                    "subject": "xxx"
+                }
+            )
+        """
+        return urljoin(cls.host, urlformat(GerritChange._endpoint, ""))
+
     @GerritRest.get()
     def info(self, *args, **kwargs):
         """Performs a GET request to retrieve information about a change.

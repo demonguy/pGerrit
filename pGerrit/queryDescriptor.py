@@ -21,6 +21,9 @@ class GerritChangeQueryDescriptor(QueryDescriptor):
     def query(self, *args, **kwargs):
         return GerritChange.query.__func__(self.factory_obj, *args, **kwargs)
 
+    def create(self, payload=None, *args, **kwargs):
+        return GerritChange.create.__func__(self.factory_obj, payload=payload, *args, **kwargs)
+
     def __call__(self, *args, **kwargs):
         '''
         :return: An instance of GerritChange.
