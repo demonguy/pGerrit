@@ -31,6 +31,9 @@ class GerritClient(object):
         else:
             self.session = requests.session()
 
+        if host.startswith('http://'):
+            raise RuntimeError("Http protocol is not supported by latest Gerrit anymore. Use Https instead")
+        
         self.verify = verify
         if not adapter:
             retry = Retry(
